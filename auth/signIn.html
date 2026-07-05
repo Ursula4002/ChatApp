@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kadea Chat</title>
+
+    <!-- Tailwind + DaisyUi -->
+
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Theme -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CONFIGURATION YUP VIA CDN ET IMPORT MAP -->
+    <script type="importmap">
+        {
+        "imports": {
+            "yup": "https://cdn.jsdelivr.net/npm/yup@1.4.0/+esm"
+        }
+        }
+    </script>
+
+    <script type="module">
+        import * as yup from 'yup'; 
+    </script>
+
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+
+<body class="min-h-screen flex items-center justify-center bg-gray-50">
+
+    <div class="w-full max-w-sm">
+
+        <!-- Logo -->
+        <div class="flex flex-col items-center mb-6">
+            <div class="w-14 h-14 rounded-xl bg-primary flex items-center justify-center shadow">
+                <svg width="26" height="26" fill="white" viewBox="0 0 24 24">
+                    <path d="M4 5a3 3 0 013-3h10a3 3 0 013 3v8a3 3 0 01-3 3H9l-5 4V5z" />
+                </svg>
+            </div>
+            <h1 class="mt-3 text-2xl font-bold text-primary">Welcome back</h1>
+        </div>
+
+        <div class="card bg-white shadow-sm">
+            <div class="card-body">
+                <!-- <h2 class="text-2xl font-semibold">Create Account</h2> -->
+                <p class="text-sm text-gray-500 mb-3">Please enter your details to sign in to Kadea Chat</p>
+
+                <!-- Zone d'alerte globale pour l'API -->
+                <div id="globalAlert" class="alert alert-error hidden text-sm p-2 mb-3"></div>
+
+                <form id="loginForm" novalidate>
+
+                    <!-- Email -->
+
+                    <label class="label"><span class="label-text">Email Address</span></label>
+                    <label class="input flex items-center gap-2">
+                        <i data-lucide="mail" class="w-4 h-4 text-gray-400"></i>
+                        <input type="email" name="email" class="grow" placeholder="name@company.com">
+                    </label>
+                    <span id="error-email" class="text-error text-xs mt-1 block"></span>
+
+                    <!-- Password -->
+
+                    <div class="flex items-center justify-between px-1">
+                        <label class="label"><span class="label-text">Password</span></label>
+                        <a href="#" class="text-xs font-medium text-primary hover:underline">Forgot?</a>
+                    </div>
+
+                    <label class="input flex items-center gap-2">
+                        <i data-lucide="lock" class="w-4 h-4 text-gray-400"></i>
+                        <input id="password" type="password" name="password" class="grow" placeholder="••••••••">
+                        <button type="button" id="togglePassword" class="btn btn-ghost btn-xs">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                    </label>
+                    <span id="error-password" class="text-error text-xs mt-1 block"></span>
+
+                    <label class="label">
+                        <input type="checkbox" name="" id="">
+                        <span class="label-text">Keep me signed in</span>
+                    </label>
+
+                    <!-- Bouton de soumission officiel -->
+                    <button type="submit" class="btn btn-primary w-full mt-5">
+                        Login
+                        <!-- <i data-lucide="arrow-right" class="w-4 h-4"></i> -->
+                    </button>
+
+                </form>
+            </div>
+        </div>
+
+        <p class="text-center text-sm mt-5">
+            Don't have an account?
+            <a href="signUp.html" class="link link-primary">Create Account</a>
+        </p>
+
+    </div>
+
+    <script type="module" src="/script/login.js"></script>
+    <script src="/script/index.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+
+        function toggle(id) {
+
+            const input = document.getElementById(id);
+
+            input.type = input.type === "password" ? "text" : "password";
+
+        }
+
+        document
+            .getElementById("togglePassword")
+            .onclick = () => toggle("password");
+
+        // document
+        //     .getElementById("toggleConfirm")
+        //     .onclick = () => toggle("confirmPassword");
+    </script>
+</body>
+
+</html>

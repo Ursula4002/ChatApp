@@ -1,0 +1,18 @@
+ body {
+     font-family: 'Inter', sans-serif;
+     background: #f6f7fb;
+ }
+
+ .input {
+     background: #f3f6fd;
+     border: none;
+ }
+
+ .input:focus {
+     outline: none;
+     box-shadow: none;
+ }
+
+ .card {
+     border: 1px solid #ececec;
+ }
