@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="light">
+<html lang="fr" data-theme="cupcake">
 
 <head>
     <meta charset="UTF-8">
@@ -129,91 +129,44 @@
         </div>
     </section>
 
-    <main class="flex-1 flex flex-col h-full bg-base-100 overflow-hidden">
-        <header class="p-4 flex items-center justify-between border-b border-base-200 flex-shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="relative w-10 h-10">
-                    <img class="w-full h-full rounded-full object-cover"
-                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80"
-                        alt="Sarah Connor" />
-                    <span
-                        class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-success ring-2 ring-white"></span>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-sm leading-tight">Sarah Connor</h3>
-                    <span class="text-[11px] text-success font-medium flex items-center gap-1">Online</span>
-                </div>
+<main class="flex-1 flex flex-col h-full bg-base-100 overflow-hidden">
+    <header class="p-4 flex items-center justify-between border-b border-base-200 flex-shrink-0 invisible" id="chat-header">
+        <div class="flex items-center gap-3" id="active-user-info">
             </div>
-            <div class="flex items-center gap-1">
-                <button class="btn btn-ghost btn-sm btn-square text-base-content/70"><i data-lucide="video"
-                        class="w-4 h-4"></i></button>
-                <button class="btn btn-ghost btn-sm btn-square text-base-content/70"><i data-lucide="phone"
-                        class="w-4 h-4"></i></button>
-                <button class="btn btn-ghost btn-sm btn-square text-base-content/70"><i data-lucide="ellipsis-vertical"
-                        class="w-4 h-4"></i></button>
-            </div>
-        </header>
-        <!-- Container des messages -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-none" id="messages-container">
-            <div class="divider text-xs text-base-content/40 my-2 font-medium">Today</div>
-
-            <div class="chat chat-start max-w-[85%]">
-                <div
-                    class="chat-bubble bg-base-200/60 text-base-content text-sm rounded-2xl px-4 py-2.5 shadow-none border border-base-200/40">
-                    Hey Alex! Did you manage to look at the designs I sent over last night?
-                </div>
-                <div class="chat-footer opacity-40 text-[10px] mt-1 pl-1">14:02</div>
-            </div>
-
-            <div class="flex flex-col items-end gap-2 max-w-[85%] ml-auto">
-                <div class="chat chat-end w-full">
-                    <div class="chat-bubble bg-primary text-primary-content text-sm rounded-2xl px-4 py-2.5 shadow-sm">
-                        Hey Sarah! Yes, I just finished reviewing them. They look incredible!
-                    </div>
-                </div>
-                <div class="chat chat-end w-full">
-                    <div class="chat-bubble bg-primary text-primary-content text-sm rounded-2xl px-4 py-2.5 shadow-sm">
-                        The new color palette really makes the dashboard pop. I think the team will love it.
-                    </div>
-                    <div class="chat-footer opacity-40 text-[10px] mt-1 pr-1 w-full text-right">14:05</div>
-                </div>
-            </div>
-
-            <div class="chat chat-start max-w-[85%]">
-                <div
-                    class="chat-bubble bg-base-200/60 text-base-content text-sm rounded-2xl px-4 py-2.5 border border-base-200/40">
-                    Awesome! I was a bit worried about the contrast on the charts, but if you think it works then I'm
-                    happy.
-                </div>
-                <div class="chat-footer opacity-40 text-[10px] mt-1 pl-1">14:15</div>
-            </div>
-
-            <div class="chat chat-start max-w-[85%]">
-                <div
-                    class="chat-bubble bg-base-200/60 text-base-content text-sm rounded-2xl px-4 py-2.5 border border-base-200/40">
-                    Yeah, that sounds like a great plan! Let's present it during the sync tomorrow.
-                </div>
-                <div class="chat-footer opacity-40 text-[10px] mt-1 pl-1">14:20</div>
-            </div>
+        <div class="flex items-center gap-1">
+            <button class="btn btn-ghost btn-sm btn-square text-base-content/70"><i data-lucide="video" class="w-4 h-4"></i></button>
+            <button class="btn btn-ghost btn-sm btn-square text-base-content/70"><i data-lucide="phone" class="w-4 h-4"></i></button>
+            <button class="btn btn-ghost btn-sm btn-square text-base-content/70"><i data-lucide="ellipsis-vertical" class="w-4 h-4"></i></button>
         </div>
-
-        <footer class="p-4 border-t border-base-200 flex items-center gap-2 flex-shrink-0">
-            <button class="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-base-content">
-                <i data-lucide="plus" class="w-5 h-5"></i>
-            </button>
-            <button class="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-base-content mr-1">
-                <i data-lucide="smile" class="w-5 h-5"></i>
-            </button>
-            <div class="flex-1 relative">
-                <input type="text" placeholder="Type a message..." id="send-message-input"
-                    class="input input-bordered w-full bg-base-200/40 border-none focus:outline-none rounded-xl pr-12 text-sm" />
-                <button id="send-message-btn"
-                    class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-primary btn-sm btn-square rounded-lg shadow-sm">
-                    <i data-lucide="send-horizontal" class="w-4 h-4 text-white"></i>
-                </button>
+    </header>
+    
+    <div class="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-none flex flex-col" id="messages-container">
+        <div class="flex-1 flex flex-col items-center justify-center text-center p-8 m-auto gap-3" id="welcome-message">
+            <div class="bg-base-200 p-4 rounded-full text-base-content/40">
+                <i data-lucide="message-square text-white" class="w-10 h-10"></i>
             </div>
-        </footer>
-    </main>
+            <h3 class="font-bold text-lg">Kadea Chat</h3>
+            <p class="text-sm text-base-content/50 max-w-xs">Sélectionnez un profil dans la liste de gauche pour débuter une conversation.</p>
+        </div>
+    </div>
+
+    <footer class="p-4 border-t border-base-200 flex items-center gap-2 flex-shrink-0 hidden" id="chat-footer">
+        <button class="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-base-content">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+        </button>
+        <button class="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-base-content mr-1">
+            <i data-lucide="smile" class="w-5 h-5"></i>
+        </button>
+        <div class="flex-1 relative">
+            <input type="text" placeholder="Type a message..." id="send-message-input"
+                class="input input-bordered w-full bg-base-200/40 border-none focus:outline-none rounded-xl pr-12 text-sm" />
+            <button id="send-message-btn"
+                class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-primary btn-sm btn-square rounded-lg shadow-sm">
+                <i data-lucide="send-horizontal" class="w-4 h-4 text-white"></i>
+            </button>
+        </div>
+    </footer>
+</main>
 
     <script>
         lucide.createIcons();

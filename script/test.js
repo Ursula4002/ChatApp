@@ -145,12 +145,9 @@ async function fetchUsers() {
  */
 
 async function handleUserClick(peerUserId, peerName, selectedCardElement) {
-    console.log(`[LOG] Clic sur l'utilisateur : ${peerName} (ID: ${peerUserId})`);
-    
     document.querySelectorAll('#userProfile-container > div').forEach(el => {
         el.classList.remove('ring-2', 'ring-primary', 'bg-blue-100');
     });
-    
     selectedCardElement.classList.add('ring-2', 'ring-primary', 'bg-blue-100');
 
     const result = await apiRequest("/conversations", "POST", {
@@ -159,18 +156,40 @@ async function handleUserClick(peerUserId, peerName, selectedCardElement) {
         participantIds: [peerUserId]
     });
 
-    console.log("[LOG] Réponse brute de l'API /conversations :", result);
-
-    // CORRECTION ICI : On plonge d'un niveau pour chercher dans 'conversation'
     const conversationId = result.data?.conversation?.id || result.data?.id || result.id;
 
     if (conversationId) {
         currentConversationId = conversationId; 
-        console.log("[SUCCÈS] currentConversationId est maintenant :", currentConversationId);
+        
+        // --- MISE À JOUR DE L'EN-TÊTE DYNAMIQUE ---
+        const chatHeader = document.getElementById('chat-header');
+        const activeUserInfo = document.getElementById('active-user-info');
+        const chatFooter = document.getElementById('chat-footer');
+        
+        // On récupère l'image depuis la carte sur laquelle on a cliqué
+        const imgEl = selectedCardElement.querySelector('img');
+        const avatarHtml = imgEl 
+            ? `<img class="w-full h-full rounded-full object-cover" src="${imgEl.src}" alt="${peerName}" />`
+            : `<div class="bg-primary text-primary-content rounded-full w-10 h-10 flex items-center justify-center font-bold text-xs">${getInitials(peerName)}</div>`;
+
+        if (activeUserInfo && chatHeader && chatFooter) {
+            activeUserInfo.innerHTML = `
+                <div class="relative w-10 h-10">
+                    ${avatarHtml}
+                    <span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-success ring-2 ring-white"></span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-sm leading-tight">${peerName}</h3>
+                    <span class="text-[11px] text-success font-medium flex items-center gap-1">Online</span>
+                </div>
+            `;
+            chatHeader.classList.remove('invisible'); // Rendre l'en-tête visible
+            chatFooter.classList.remove('hidden');    // Afficher la zone d'envoi
+        }
+        
         fetchMessages(); 
     } else {
-        console.error("[ERREUR] Impossible de trouver l'ID dans la réponse :", result);
-        alert(`Impossible d'ouvrir la discussion.`);
+        alert("Impossible d'ouvrir la discussion.");
     }
 }
 
