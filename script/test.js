@@ -225,6 +225,12 @@ async function handleUserClick(peerUserId, peerName, selectedCardElement) {
 //     messagesContainer.scrollTop = messagesContainer.scrollHeight; 
 // }
 
+function formatMessageTime(dateString) {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
 async function fetchMessages() {
     if (!currentConversationId) return;
 
@@ -239,14 +245,23 @@ const messages = result.data?.messages || result.data || [];
 
     messages.forEach(msg => {
         const isMe = msg.senderId === localStorage.getItem("chat_user_id");
+const formattedTime = formatMessageTime(msg.createdAt || msg.updatedAt);
 
         const messageTemplate = isMe ? `
-            <div class="chat chat-end">
-                <div class="chat-bubble chat-bubble-primary text-white text-sm rounded-2xl max-w-md">${msg.content}</div>
+            <div class="flex flex-col items-end gap-2 max-w-[85%] ml-auto">
+                <div class="chat chat-end w-full">
+                    <div class="chat-bubble bg-primary text-primary-content text-sm rounded-2xl px-4 py-2.5 shadow-sm">
+                        ${msg.content}
+                    </div>
+                    <div class="chat-footer opacity-40 text-[10px] mt-1 pr-1 w-full text-right">${formattedTime}</div>
+                </div>
             </div>
         ` : `
-            <div class="chat chat-start">
-                <div class="chat-bubble bg-base-200 text-base-content text-sm rounded-2xl max-w-md">${msg.content}</div>
+            <div class="chat chat-start max-w-[85%]">
+                <div class="chat-bubble bg-base-200/60 text-base-content text-sm rounded-2xl px-4 py-2.5 border border-base-200/40 shadow-none">
+                    ${msg.content}
+                </div>
+                <div class="chat-footer opacity-40 text-[10px] mt-1 pl-1">${formattedTime}</div>
             </div>
         `;
         messagesContainer.insertAdjacentHTML('beforeend', messageTemplate);
