@@ -3,7 +3,7 @@ const API_BASE_URL = "https://kadea-chat-api.onrender.com";
 const API_KEY = "wksp_c7f8367d338d051ae4fbfe357909497a";
 const USER_TOKEN = localStorage.getItem("chat_jwt_token");
 
-// L'intention de conception : explicitement vide au démarrage
+// Identifiant de session pour la discussion active
 let currentConversationId = null; 
 
 const globalHeaders = {
@@ -12,18 +12,27 @@ const globalHeaders = {
     "Authorization": `Bearer ${USER_TOKEN}`
 };
 
-// ==================== FONCTIONS UTILITAIRES (FACTORISATION) ====================
+// ==================== FONCTIONS UTILITAIRES ====================
 
 /**
- * Centralisation des appels Fetch pour éviter les répétitions (Point 2)
+ * Centralisation des requêtes Fetch vers l'API Kadea
  */
+
 async function apiRequest(endpoint, method = "GET", body = null) {
     try {
         const config = { method, headers: globalHeaders };
-        if (body) config.body = JSON.stringify(body); // JS -> Texte pour le réseau
+        if (body) config.body = JSON.stringify(body);
 
         const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-        return await response.json(); // Texte -> JS pour notre code
+        const data = await response.json();
+        
+        // CORRECTION ICI : Si le serveur renvoie un format plat, on injecte 'success' 
+        // basé sur le statut HTTP de la réponse (200, 201, etc.)
+        if (!data.hasOwnProperty('success')) {
+            data.success = response.ok;
+        }
+        
+        return data;
     } catch (error) {
         console.error(`Erreur API sur ${endpoint} :`, error);
         return { success: false, message: error.message };
@@ -31,7 +40,7 @@ async function apiRequest(endpoint, method = "GET", body = null) {
 }
 
 /**
- * Génère un bloc contenant 1 ou 2 initiales en majuscules (Point 1)
+ * Extrait un maximum de deux initiales d'un nom complet
  */
 function getInitials(fullName) {
     if (!fullName) return "?";
@@ -41,7 +50,7 @@ function getInitials(fullName) {
 }
 
 /**
- * Génère le composant visuel de l'avatar (Image ou Initiales) (Point 1)
+ * Génère la structure HTML d'un avatar (Image ou bloc initiales)
  */
 function createAvatarTemplate(avatarUrl, fullName) {
     if (avatarUrl) {
@@ -54,7 +63,7 @@ function createAvatarTemplate(avatarUrl, fullName) {
     `;
 }
 
-// ==================== LOGIQUE DE L'APPLICATION ====================
+// ==================== LOGIQUE APPLICATIVE ====================
 
 /**
  * 1. Récupère et affiche le profil de l'utilisateur connecté
@@ -64,43 +73,42 @@ async function fetchConnectedUser() {
     const connectedUser = result.data?.user;
 
     if (connectedUser) {
-        // Optionnel : sauvegarde de mon propre ID pour le tri des messages (Point 9)
         localStorage.setItem("chat_user_id", connectedUser.id);
 
         const connectedUserContainer = document.getElementById('connectedUser-container');
-        connectedUserContainer.innerHTML = `
-            <div class="flex items-center gap-3">
-                <div class="relative w-10 h-10 flex items-center justify-center">
-                    ${createAvatarTemplate(connectedUser.avatarUrl, connectedUser.fullName)}
-                    <span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-success ring-2 ring-white"></span>
+        if (connectedUserContainer) {
+            connectedUserContainer.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="relative w-10 h-10 flex items-center justify-center">
+                        ${createAvatarTemplate(connectedUser.avatarUrl, connectedUser.fullName)}
+                        <span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-success ring-2 ring-white"></span>
+                    </div>
+                    <div>
+                        <h2 class="font-semibold text-sm leading-tight">${connectedUser.fullName}</h2>
+                        <span class="text-xs text-base-content/50">My Status: Active</span>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="font-semibold text-sm leading-tight">${connectedUser.fullName}</h2>
-                    <span class="text-xs text-base-content/50">My Status: Active</span>
-                </div>
-            </div>
-        `;
+            `;
+        }
     }
 }
 
 /**
- * 2. Récupère et lister les utilisateurs disponibles dans la barre latérale
+ * 2. Récupère et affiche la liste des utilisateurs du workspace
  */
 async function fetchUsers() {
     const result = await apiRequest("/users");
     const users = result.data?.users || []; 
 
     const userProfileContainer = document.getElementById('userProfile-container');
+    if (!userProfileContainer) return;
+    
     userProfileContainer.innerHTML = ''; 
 
     users.forEach(user => {
-        // CORRECTION MAJEURE : On crée l'élément proprement en JavaScript
         const userProfileCard = document.createElement('div');
-        
-        // Ajout du style d'origine exact
         userProfileCard.className = "flex items-center gap-3 p-3 rounded-xl bg-blue-50/70 cursor-pointer border border-blue-100/50 hover:bg-blue-100/50 transition-colors";
         
-        // CORRECTION SÉCURITÉ CLIC : On attache l'événement en JS directement, pas en attribut HTML
         userProfileCard.addEventListener('click', () => {
             handleUserClick(user.id, user.fullName, userProfileCard);
         });
@@ -132,79 +140,87 @@ async function fetchUsers() {
     });
 }
 
-
-
 /**
- * 3. Déclenchée au clic sur un utilisateur : crée ou ouvre le salon de chat (Point 6 & 7)
+ * 3. Gère l'activation visuelle et la récupération de l'ID du salon de discussion
  */
+
 async function handleUserClick(peerUserId, peerName, selectedCardElement) {
-    console.log(`[LOG] Déclenchement de la discussion avec : ${peerName}`);
+    console.log(`[LOG] Clic sur l'utilisateur : ${peerName} (ID: ${peerUserId})`);
     
-    // Retirer le style "actif" de l'ancien utilisateur sélectionné
     document.querySelectorAll('#userProfile-container > div').forEach(el => {
         el.classList.remove('ring-2', 'ring-primary', 'bg-blue-100');
     });
     
-    // Ajouter un indicateur visuel sur l'utilisateur actif
     selectedCardElement.classList.add('ring-2', 'ring-primary', 'bg-blue-100');
 
-    // Requête POST pour ouvrir ou générer le canal
     const result = await apiRequest("/conversations", "POST", {
         type: "private",
         name: `Chat avec ${peerName}`,
         participantIds: [peerUserId]
     });
 
-    if (result.success && result.data?.id) {
-        currentConversationId = result.data.id; 
-        console.log("[SUCCÈS] Salon Kadea connecté avec l'ID :", currentConversationId);
-        
-        // Charger les messages immédiatement
+    console.log("[LOG] Réponse brute de l'API /conversations :", result);
+
+    // CORRECTION ICI : On plonge d'un niveau pour chercher dans 'conversation'
+    const conversationId = result.data?.conversation?.id || result.data?.id || result.id;
+
+    if (conversationId) {
+        currentConversationId = conversationId; 
+        console.log("[SUCCÈS] currentConversationId est maintenant :", currentConversationId);
         fetchMessages(); 
     } else {
-        console.error("Impossible de lier la conversation via l'API", result);
+        console.error("[ERREUR] Impossible de trouver l'ID dans la réponse :", result);
+        alert(`Impossible d'ouvrir la discussion.`);
     }
 }
 
 /**
- * 5. Gestion de l'envoi lié au DOM réel
+ * 4. Charge et formate l'historique complet des messages du salon actif
  */
-function setupMessageSending() {
-    const sendMessageInput = document.getElementById('send-message-input');
-    const sendMessageBtn = document.getElementById('send-message-btn');
+// async function fetchMessages() {
+//     if (!currentConversationId) return;
 
-    // Gestion du clic bouton
-    sendMessageBtn.addEventListener('click', async (e) => {
-        e.preventDefault(); 
-        await executeSendMessage(sendMessageInput);
-    });
+//     const result = await apiRequest(`/conversations/${currentConversationId}/messages`);
+//     const messages = result.data || [];
 
-    // Optionnel et ultra-confortable : envoi aussi en pressant "Entrée" dans le champ
-    sendMessageInput.addEventListener('keydown', async (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            await executeSendMessage(sendMessageInput);
-        }
-    });
-}
+//     const messagesContainer = document.getElementById('messages-container');
+//     if (!messagesContainer) return;
+    
+//     messagesContainer.innerHTML = ''; 
 
-/**
- * 4. Charge l'historique de la discussion sélectionnée
- */
+//     messages.forEach(msg => {
+//         const isMe = msg.senderId === localStorage.getItem("chat_user_id");
+
+//         const messageTemplate = isMe ? `
+//             <div class="chat chat-end">
+//                 <div class="chat-bubble chat-bubble-primary text-white text-sm rounded-2xl max-w-md">${msg.content}</div>
+//             </div>
+//         ` : `
+//             <div class="chat chat-start">
+//                 <div class="chat-bubble bg-base-200 text-base-content text-sm rounded-2xl max-w-md">${msg.content}</div>
+//             </div>
+//         `;
+//         messagesContainer.insertAdjacentHTML('beforeend', messageTemplate);
+//     });
+    
+//     messagesContainer.scrollTop = messagesContainer.scrollHeight; 
+// }
+
 async function fetchMessages() {
     if (!currentConversationId) return;
 
     const result = await apiRequest(`/conversations/${currentConversationId}/messages`);
-    const messages = result.data || [];
+    // CORRECTION ICI : s'adapte si l'API renvoie directement le tableau ou un objet contenant le tableau
+const messages = result.data?.messages || result.data || [];
 
     const messagesContainer = document.getElementById('messages-container');
-    messagesContainer.innerHTML = ''; // Nettoyer l'ancienne discussion
+    if (!messagesContainer) return;
+    
+    messagesContainer.innerHTML = ''; 
 
     messages.forEach(msg => {
-        // Calcul logique indispensable : détermine le côté (Point 9)
         const isMe = msg.senderId === localStorage.getItem("chat_user_id");
 
-        // Renommage explicite pour une meilleure lisibilité (Point 8)
         const messageTemplate = isMe ? `
             <div class="chat chat-end">
                 <div class="chat-bubble chat-bubble-primary text-white text-sm rounded-2xl max-w-md">${msg.content}</div>
@@ -217,17 +233,49 @@ async function fetchMessages() {
         messagesContainer.insertAdjacentHTML('beforeend', messageTemplate);
     });
     
-    // Force la scrollbar à descendre au dernier message reçu (Point 10)
     messagesContainer.scrollTop = messagesContainer.scrollHeight; 
 }
 
 /**
- * 5. Initialise l'écouteur sur le bouton d'envoi de message
+ * 5. Initialise les écouteurs sur les éléments d'envoi du DOM
  */
-async function executeSendMessage(inputElement) {
+function setupMessageSending() {
+    const sendMessageBtn = document.getElementById('send-message-btn');
+    const sendMessageInput = document.getElementById('send-message-input');
+
+    if (sendMessageBtn) {
+        sendMessageBtn.addEventListener('click', async (e) => {
+            e.preventDefault(); 
+            await executeSendMessage(); 
+        });
+    }
+
+    if (sendMessageInput) {
+        sendMessageInput.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                await executeSendMessage();
+            }
+        });
+    }
+}
+
+/**
+ * Extrait la valeur textuelle, valide le contexte et pousse le message vers l'API
+ */
+
+async function executeSendMessage() {
+    const inputElement = document.getElementById('send-message-input'); 
+
+    if (!inputElement) {
+        console.error("Erreur critique : L'élément HTML 'send-message-input' est introuvable.");
+        return;
+    }
+
     const text = inputElement.value.trim();
     
-    if (!text) return;
+    if (!text) return; 
+    
     if (!currentConversationId) {
         alert("Action impossible : Sélectionnez d'abord un utilisateur dans la liste de gauche !");
         return;
@@ -237,20 +285,20 @@ async function executeSendMessage(inputElement) {
         content: text
     });
 
-    if (result.success) {
-        inputElement.value = ''; // On vide le champ
-        fetchMessages(); // Rechargement forcé de la zone centrale
+    if (result && result.success) {
+        inputElement.value = ''; 
+        fetchMessages(); 
     } else {
-        alert("L'API a refusé le message : " + result.message);
+        alert("L'API a refusé le message : " + (result.message || "Erreur inconnue"));
     }
 }
 
 // ==================== INITIALISATION AUTOMATIQUE ====================
 fetchConnectedUser();
 fetchUsers();
-executeSendMessage();
+setupMessageSending();
 
-// Surveillance en arrière-plan : charge les nouveaux messages toutes les 4 secondes
+// Polling de mise à jour synchronisée toutes les 4 secondes
 setInterval(() => {
     if (currentConversationId) fetchMessages();
 }, 4000);
