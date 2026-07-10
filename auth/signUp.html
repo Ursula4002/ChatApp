@@ -7,8 +7,8 @@
     <title>Kadea Chat</title>
 
     <!-- Tailwind + DaisyUi -->
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
 
     <!-- Google Font -->
@@ -46,6 +46,8 @@
             <h1 class="mt-3 text-2xl font-bold text-primary">Kadea Chat</h1>
         </div>
 
+        <!-- Formulaire -->
+
         <div class="card bg-white shadow-sm">
             <div class="card-body">
                 <h2 class="text-2xl font-semibold">Create Account</h2>
@@ -54,7 +56,7 @@
                 <!-- Zone d'alerte globale pour l'API -->
                 <div id="globalAlert" class="alert alert-error hidden text-sm p-2 mb-3"></div>
 
-                <!-- FORMULAIRE AJOUTÉ -->
+                <!-- FORMULAIRE DEBUT -->
                 <form id="registerForm" novalidate>
 
                     <!-- Full Name -->
@@ -63,6 +65,7 @@
                         <i data-lucide="user" class="w-4 h-4 text-gray-400"></i>
                         <input type="text" name="fullName" class="grow" placeholder="Jane Doe">
                     </label>
+                    <!-- Message d'erreur -->
                     <span id="error-fullName" class="text-error text-xs mt-1 block"></span>
 
                     <!-- Email -->
@@ -71,6 +74,7 @@
                         <i data-lucide="mail" class="w-4 h-4 text-gray-400"></i>
                         <input type="email" name="email" class="grow" placeholder="name@example.com">
                     </label>
+                    <!-- Message d'erreur -->
                     <span id="error-email" class="text-error text-xs mt-1 block"></span>
 
                     <!-- Password -->
@@ -82,6 +86,7 @@
                             <i data-lucide="eye" class="w-4 h-4"></i>
                         </button>
                     </label>
+                    <!-- Message d'erreur -->
                     <span id="error-password" class="text-error text-xs mt-1 block"></span>
 
                     <!-- Confirm Password -->
@@ -94,6 +99,7 @@
                             <i data-lucide="eye" class="w-4 h-4"></i>
                         </button>
                     </label>
+                    <!-- Message d'erreur -->
                     <span id="error-confirmPassword" class="text-error text-xs mt-1 block"></span>
 
                     <!-- Bouton de soumission  -->
@@ -125,17 +131,25 @@
     <script type="module" src="/script/auth.js"></script>
     <script type="module" src="/script/index.js"></script>
 
-
+    <!-- Lien pour les icônes lucides -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
-        // Initialisation des icônes
+        // Initialisation des icônes lucides
         lucide.createIcons();
 
         // Système d'affichage de mot de passe existant
         function toggle(id) {
+            // Ici La variable id est un paramètre dynamique. Elle sert de passerelle 
+            // pour cibler précisément le champ de saisie (<input>) que l'on souhaite 
+            // masquer ou afficher.
             const input = document.getElementById(id);
+            // Si le type de l'input est "password", au clic il redevient un simple input "texte", 
+            // on peut donc lire le texte qui y figure
             input.type = input.type === "password" ? "text" : "password";
         }
+        //  Selon l'input sur lequel le user clique, on récupère cet Id qui sera passé à toggle
+        // Si clique sur le premier mon id devient "password", sur le second "confirmPassword" et 
+        // cce sera donc cela mon id.
         document.getElementById("togglePassword").onclick = (e) => { e.preventDefault(); toggle("password"); };
         document.getElementById("toggleConfirm").onclick = (e) => { e.preventDefault(); toggle("confirmPassword"); };
     </script>
