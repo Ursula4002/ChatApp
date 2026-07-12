@@ -15,6 +15,18 @@ const globalHeaders = {
     "Authorization": `Bearer ${USER_TOKEN}`
 };
 
+// ==========================================
+// POUVOIR DE SÉCURITÉ : VÉRIFICATION DU TOKEN
+// ==========================================
+
+const token = localStorage.getItem("chat_jwt_token");
+
+// Si le token n'existe pas du tout dans le localStorage
+if (!token) {
+    // On redirige immédiatement vers la page de connexion
+    window.location.href = "/auth/signIn.html";
+}
+
 // ==================== FONCTIONS UTILITAIRES ====================
 
 /**
@@ -144,39 +156,39 @@ async function fetchUsers() {
 
     userProfileContainer.innerHTML = '';
 
-    users.forEach(user => {
-        const userProfileCard = document.createElement('div');
-        userProfileCard.className = "flex items-center gap-3 p-3 rounded-xl bg-blue-50/70 cursor-pointer border border-blue-100/50 hover:bg-blue-100/50 transition-colors";
+users.forEach(user => {
+    const userProfileCard = document.createElement('div');
+    userProfileCard.className = "flex items-center gap-3 p-3 rounded-xl bg-base-200/70 cursor-pointer border border-base-content/10 hover:bg-base-200 transition-colors";
 
-        userProfileCard.addEventListener('click', () => {
-            handleUserClick(user.id, user.fullName, userProfileCard);
-        });
-
-        const avatarContent = user?.avatarUrl
-            ? `<img src="${user.avatarUrl}" alt="${user.fullName}" />`
-            : getInitials(user.fullName);
-
-        const avatarClass = user?.avatarUrl ? "w-11 rounded-full" : "bg-blue-100 text-blue-600 rounded-full w-11 h-11 flex items-center justify-center font-semibold text-sm";
-
-        userProfileCard.innerHTML = `
-            <div class="avatar ${!user?.avatarUrl ? 'placeholder' : ''}">
-                <div class="${avatarClass}">
-                    ${avatarContent}
-                </div>
-            </div>
-            <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between mb-0.5">
-                    <span class="font-semibold text-sm">${user.fullName}</span>
-                    <span class="text-[10px] text-primary font-medium">14:20</span>
-                </div>
-                <p class="text-xs text-base-content/70 truncate">Yeah, that sounds like a great plan!</p>
-            </div>
-            <div class="badge badge-primary badge-sm text-[10px] h-5 w-5 font-bold rounded-full p-0 flex items-center justify-center">
-                2
-            </div>
-        `;
-        userProfileContainer.appendChild(userProfileCard);
+    userProfileCard.addEventListener('click', () => {
+        handleUserClick(user.id, user.fullName, userProfileCard);
     });
+
+    const avatarContent = user?.avatarUrl
+        ? `<img src="${user.avatarUrl}" alt="${user.fullName}" />`
+        : getInitials(user.fullName);
+
+    const avatarClass = user?.avatarUrl ? "w-11 rounded-full" : "bg-primary/10 text-primary rounded-full w-11 h-11 flex items-center justify-center font-semibold text-sm";
+
+    userProfileCard.innerHTML = `
+        <div class="avatar ${!user?.avatarUrl ? 'placeholder' : ''}">
+            <div class="${avatarClass}">
+                ${avatarContent}
+            </div>
+        </div>
+        <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between mb-0.5">
+                <span class="font-semibold text-sm text-base-content">${user.fullName}</span>
+                <span class="text-[10px] text-primary font-medium">14:20</span>
+            </div>
+            <p class="text-xs text-base-content/70 truncate">Yeah, that sounds like a great plan!</p>
+        </div>
+        <div class="badge badge-primary badge-sm text-[10px] h-5 w-5 font-bold rounded-full p-0 flex items-center justify-center">
+            2
+        </div>
+    `;
+    userProfileContainer.appendChild(userProfileCard);
+});
 }
 
 /**
@@ -390,16 +402,16 @@ function switchView(viewName) {
         chatView.classList.add('hidden');
         profileView.classList.remove('hidden');
 
-        if (settingsBtn) settingsBtn.classList.add('text-primary', 'bg-blue-50/50', 'rounded-xl');
-        if (chatTabBtn) chatTabBtn.classList.remove('text-primary', 'bg-blue-50/50');
+        if (settingsBtn) settingsBtn.classList.add('text-primary', 'bg-primary/10', 'rounded-xl');
+        if (chatTabBtn) chatTabBtn.classList.remove('text-primary', 'bg-primary/10');
 
         populateProfileForm();
     } else {
         profileView.classList.add('hidden');
         chatView.classList.remove('hidden');
 
-        if (settingsBtn) settingsBtn.classList.remove('text-primary', 'bg-blue-50/50');
-        if (chatTabBtn) chatTabBtn.classList.add('text-primary', 'bg-blue-50/50');
+        if (settingsBtn) settingsBtn.classList.remove('text-primary', 'bg-primary/10');
+        if (chatTabBtn) chatTabBtn.classList.add('text-primary', 'bg-primary/10');
     }
 }
 
@@ -570,7 +582,14 @@ async function logOut() {
 
 }
 
-
-
-
 logOut()
+
+async function deleteMessage() {
+    const result = await apiRequest(`/messages/:${id}`);
+    // CORRECTION ICI : s'adapte si l'API renvoie directement le tableau ou un objet contenant le tableau
+    const messages = result.data?.messages || result.data || [];
+    console.log("-----------DELETE MESSAGE----------------- :", messages );
+    
+}
+
+deleteMessage()

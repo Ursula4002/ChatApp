@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="light">
+<html lang="fr" data-theme="">
 
 <head>
     <meta charset="UTF-8">
@@ -18,7 +18,7 @@
             <div class="text-primary">
                 <i data-lucide="message-square" class="w-7 h-7 stroke-[2]"></i>
             </div>
-            <button class="btn btn-ghost btn-square text-primary bg-blue-50/50 rounded-xl">
+            <button class="btn btn-ghost btn-square text-primary rounded-xl">
                 <i data-lucide="message-square-text" class="w-5 h-5"></i>
             </button>
             <button class="btn btn-ghost btn-square text-base-content/60 hover:text-base-content">
@@ -117,7 +117,7 @@
 
             <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-base-200/50 cursor-pointer transition-colors">
                 <div class="avatar placeholder">
-                    <div class="bg-slate-200 text-slate-600 rounded-full w-11 font-semibold text-sm">DW</div>
+                    <div class="bg-base-300 text-base-content/70 rounded-full w-11 font-semibold text-sm">DW</div>
                 </div>
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between mb-0.5">
@@ -149,8 +149,9 @@
         <div class="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-none flex flex-col" id="messages-container">
             <div class="flex-1 flex flex-col items-center justify-center text-center p-8 m-auto gap-3"
                 id="welcome-message">
-                <div class="bg-base-200 p-4 rounded-full text-base-content/40">
-                    <i data-lucide="send-horizontal" class="w-10 h-10 text-white"></i>
+                <div
+                    class="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary animate-bounce">
+                    <i data-lucide="send-horizontal" class="h-8 w-8"></i>
                 </div>
                 <h3 class="font-bold text-lg">Kadea Chat</h3>
                 <p class="text-sm text-base-content/50 max-w-xs">Sélectionnez un profil dans la liste de gauche pour
@@ -176,122 +177,178 @@
 
     <!-- Section principale de profile ( modifier son profile )  -->
 
-    <main class="flex-1 flex flex-col h-full bg-slate-50 overflow-y-auto p-8 hidden" id="profile-view">
+    <main class="flex-1 flex flex-col h-full bg-base-200 overflow-y-auto p-8 hidden" id="profile-view">
         <div id="toast-container" class="toast toast-end toast-bottom z-50"></div>
 
         <div class="max-w-2xl mx-auto w-full flex flex-col items-center gap-6">
 
             <div class="flex flex-col items-center text-center gap-3 relative">
-                <div
+                <!-- Cette div doit être remplacé par celle du bas -->
+                <!-- <div
                     class="relative w-24 h-24 shadow-md rounded-full border-4 border-white overflow-hidden bg-base-200 flex items-center justify-center">
                     <div id="profile-avatar-inside" class="w-full h-full flex items-center justify-center">
                     </div>
                     <span
                         class="absolute bottom-1 right-1 block h-4 w-4 rounded-full bg-success ring-2 ring-white"></span>
-                </div>
-
-                <input type="file" id="avatar-file-input" accept="image/*" class="hidden" />
-                <button onclick="document.getElementById('avatar-file-input').click()"
-                    class="btn btn-circle btn-xs btn-primary absolute bottom-14 right-1 shadow-md">
-                    <i data-lucide="camera" class="w-3 h-3 text-white"></i>
-                </button>
-
-                <div>
-                    <h1 class="text-lg font-bold text-slate-800" id="profile-display-name">---</h1>
-                    <p class="text-xs text-slate-400" id="profile-display-email">---</p>
-                    <div class="badge badge-sm bg-blue-100 text-blue-700 border-none mt-2 font-medium py-2 px-3"
-                        id="profile-display-date">
-                        <i data-lucide="shield-check" class="w-3 h-3 mr-1"></i> Member since October 2023
+                </div> -->
+                <!-- Cette div doit remplacé celle du dessus -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                    <!-- Zone Photo de profil avec survol caméra -->
+                    <div class="flex flex-col items-center">
+                        <div class="relative group cursor-pointer">
+                            <div class="avatar">
+                                <div class="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                                    <img id="profile-avatar"
+                                        src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                                        alt="Avatar Actuel" />
+                                </div>
+                            </div>
+                            <!-- Overlay Caméra pour changement de photo -->
+                            <div
+                                class="absolute inset-0 rounded-full bg-black/40 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <i class="fa-solid fa-camera text-xl mb-1"></i>
+                                <span class="text-[9px] uppercase font-bold tracking-wider text-center px-2">Changer la
+                                    photo</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                <!-- left settings -->
-                <div class="card bg-white border border-slate-200 p-5 rounded-xl shadow-sm space-y-3">
-                    <div class="flex items-center justify-between text-slate-500">
-                        <h3 class="font-bold text-xs tracking-wider uppercase opacity-80">Account Details</h3>
-                        <i data-lucide="contact-2" class="w-4 h-4 opacity-60"></i>
-                    </div>
+                    <input type="file" id="avatar-file-input" accept="image/*" class="hidden" />
+                    <button onclick="document.getElementById('avatar-file-input').click()"
+                        class="btn btn-circle btn-xs btn-primary absolute bottom-14 right-1 shadow-md">
+                        <i data-lucide="camera" class="w-3 h-3 text-white"></i>
+                    </button>
 
                     <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Full
-                            Name</label>
-                        <input type="text" id="profile-fullname-input"
-                            class="input input-sm input-bordered w-full rounded-md bg-slate-50 text-sm focus:outline-none" />
-                    </div>
-
-                    <div>
-                        <label
-                            class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Username</label>
-                        <input type="text" value="arivera_chat" disabled
-                            class="input input-sm input-bordered w-full rounded-md bg-slate-100 text-slate-400 text-sm focus:outline-none cursor-not-allowed" />
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label
-                                class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Phone</label>
-                            <input type="text" value="+1 (555) 012-3456" disabled
-                                class="input input-sm input-bordered w-full rounded-md bg-slate-100 text-slate-400 text-xs focus:outline-none cursor-not-allowed" />
-                        </div>
-                        <div>
-                            <label
-                                class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Language</label>
-                            <input type="text" value="English (US)" disabled
-                                class="input input-sm input-bordered w-full rounded-md bg-slate-100 text-slate-400 text-xs focus:outline-none cursor-not-allowed" />
+                        <h1 class="text-lg font-bold text-base-content" id="profile-display-name">---</h1>
+                        <p class="text-xs text-base-content/70" id="profile-display-email">---</p>
+                        <div class="badge badge-sm bg-blue-100 text-blue-700 border-none mt-2 font-medium py-2 px-3"
+                            id="profile-display-date">
+                            <i data-lucide="shield-check" class="w-3 h-3 mr-1"></i> Member since October 2023
                         </div>
                     </div>
                 </div>
-                <!-- Right settings -->
-                <div
-                    class="card bg-white border border-slate-200 p-5 rounded-xl shadow-sm flex flex-col justify-between">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between text-slate-500">
-                            <h3 class="font-bold text-xs tracking-wider uppercase opacity-80">Privacy & Security</h3>
-                            <i data-lucide="lock" class="w-4 h-4 opacity-60"></i>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                    <!-- left settings -->
+                    <div class="card bg-base-100 border border-base-content/10 p-5 rounded-xl shadow-sm space-y-3">
+                        <div class="flex items-center justify-between text-base-content/70">
+                            <h3 class="font-bold text-xs tracking-wider uppercase opacity-80">Account Details</h3>
+                            <i data-lucide="contact-2" class="w-4 h-4 opacity-60"></i>
                         </div>
 
-                        <div class="flex items-center justify-between py-2 border-b border-slate-100 text-sm">
-                            <span class="flex items-center gap-2 text-slate-700"><i data-lucide="shield"
-                                    class="w-4 h-4 text-slate-400"></i> Two-Factor Auth</span>
-                            <span class="text-xs font-semibold text-blue-600">Enabled</span>
+                        <!-- <div>
+                            <label class="text-[10px] font-bold text-base-content/70 uppercase tracking-wider block mb-1">Full
+                                Name</label>
+                            <input type="text" id="profile-fullname-input"
+                                class="input input-sm input-bordered w-full rounded-md bg-base-100 text-sm focus:outline-none" />
+                        </div> -->
+
+                        <div>
+                            <label
+                                class="text-[10px] font-bold text-base-content/70 uppercase tracking-wider block mb-1">Username</label>
+                            <input type="text" value="arivera_chat" disabled
+                                class="input input-sm input-bordered w-full rounded-md bg-base-200 text-base-content/70 text-sm focus:outline-none cursor-not-allowed" />
                         </div>
 
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label
+                                    class="text-[10px] font-bold text-base-content/70 uppercase tracking-wider block mb-1">Phone</label>
+                                <input type="text" value="+1 (555) 012-3456" disabled
+                                    class="input input-sm input-bordered w-full rounded-md bg-base-200 text-base-content/70 text-xs focus:outline-none cursor-not-allowed" />
+                            </div>
+                            <div>
+                                <label
+                                    class="text-[10px] font-bold text-base-content/70 uppercase tracking-wider block mb-1">Language</label>
+                                <input type="text" value="English (US)" disabled
+                                    class="input input-sm input-bordered w-full rounded-md bg-base-200 text-base-content/70 text-xs focus:outline-none hover:cursor-pointer" />
+                            </div>
+                        </div>
+
+                        <!-- Theme Settings -->
                         <div
-                            class="flex items-center justify-between py-2 border-b border-slate-100 text-sm cursor-pointer hover:bg-slate-50 px-1 rounded transition-colors">
-                            <span class="flex items-center gap-2 text-slate-700"><i data-lucide="eye"
-                                    class="w-4 h-4 text-slate-400"></i> Active Sessions</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 opacity-40"></i>
-                        </div>
+                            class="card bg-base-100 border border-base-300 p-5 rounded-xl shadow-sm space-y-3 text-left mt-4">
+                            <div class="flex items-center justify-between text-base-content/70">
+                                <h3 class="font-bold text-xs tracking-wider uppercase opacity-80">Apparence & Thème</h3>
+                                <i data-lucide="palette" class="w-4 h-4 opacity-60"></i>
+                            </div>
 
-                        <div
-                            class="flex items-center justify-between py-2 text-sm cursor-pointer hover:bg-slate-50 px-1 rounded transition-colors">
-                            <span class="flex items-center gap-2 text-slate-700"><i data-lucide="bell"
-                                    class="w-4 h-4 text-slate-400"></i> Alert Preferences</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 opacity-40"></i>
+                            <div>
+                                <label
+                                    class="text-[10px] font-bold text-base-content/50 uppercase tracking-wider block mb-2">Choisir
+                                    un mode</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <!-- Bouton Mode Clair -->
+                                    <button id="theme-light-btn"
+                                        class="btn btn-sm btn-outline gap-2 justify-start font-medium text-xs rounded-md">
+                                        <i data-lucide="sun" class="w-3.5 h-3.5"></i> Clair
+                                    </button>
+                                    <!-- Bouton Mode Sombre -->
+                                    <button id="theme-dark-btn"
+                                        class="btn btn-sm btn-outline gap-2 justify-start font-medium text-xs rounded-md">
+                                        <i data-lucide="moon" class="w-3.5 h-3.5"></i> Sombre
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-1 border-t border-base-200">
+                                <span class="text-xs text-base-content/70">Mode automatique (Heure)</span>
+                                <input type="checkbox" id="theme-auto-toggle" class="toggle toggle-primary toggle-sm"
+                                    checked />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right settings -->
+                    <div
+                        class="card bg-base-100 border border-base-content/10 p-5 rounded-xl shadow-sm flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between text-base-content/70">
+                                <h3 class="font-bold text-xs tracking-wider uppercase opacity-80">Privacy & Security
+                                </h3>
+                                <i data-lucide="lock" class="w-4 h-4 opacity-60"></i>
+                            </div>
+
+                            <div class="flex items-center justify-between py-2 border-b border-base-content/10 text-sm">
+                                <span class="flex items-center gap-2 text-base-content"><i data-lucide="shield"
+                                        class="w-4 h-4 text-base-content/70"></i> Two-Factor Auth</span>
+                                <span class="text-xs font-semibold text-blue-600">Enabled</span>
+                            </div>
+
+                            <div
+                                class="flex items-center justify-between py-2 border-b border-base-content/10 text-sm cursor-pointer hover:bg-base-200 px-1 rounded transition-colors">
+                                <span class="flex items-center gap-2 text-base-content"><i data-lucide="eye"
+                                        class="w-4 h-4 text-base-content/70"></i> Active Sessions</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 opacity-40"></i>
+                            </div>
+
+                            <div
+                                class="flex items-center justify-between py-2 text-sm cursor-pointer hover:bg-base-200 px-1 rounded transition-colors">
+                                <span class="flex items-center gap-2 text-base-content"><i data-lucide="bell-ring"
+                                        class="w-4 h-4 text-base-content/70"></i> Alert Preferences</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 opacity-40"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="flex flex-col gap-2 w-full max-w-sm mt-2">
-                <button id="profile-save-btn" class="btn btn-primary w-full rounded-xl text-white font-medium">
-                    <span id="save-btn-text"><i data-lucide="pen-tool" class="w-4 h-4 inline mr-1"></i> Edit
-                        Profile</span>
-                    <span id="save-btn-spinner" class="loading loading-spinner loading-xs hidden"></span>
-                </button>
-                <button
-                    class="btn bg-slate-200 border-none hover:bg-slate-300 w-full rounded-xl text-slate-700 font-medium">
-                    <i data-lucide="key-round" class="w-4 h-4 inline mr-1"></i> Change Password
-                </button>
-                <button id="logout-btn"
-                    class="btn btn-ghost text-red-600 hover:bg-red-50 w-full rounded-xl font-medium">
-                    <i data-lucide="log-out" class="w-4 h-4 inline mr-1"></i> Logout
-                </button>
-            </div>
+                <div class="flex flex-col gap-2 w-full max-w-sm mt-2">
+                    <button id="profile-save-btn" class="btn btn-primary w-full rounded-xl text-white font-medium">
+                        <span id="save-btn-text"><i data-lucide="pen-tool" class="w-4 h-4 inline mr-1"></i> Edit
+                            Profile</span>
+                        <span id="save-btn-spinner" class="loading loading-spinner loading-xs hidden"></span>
+                    </button>
+                    <button
+                        class="btn bg-base-300 border-none hover:bg-base-200 w-full rounded-xl text-base-content font-medium">
+                        <i data-lucide="key-round" class="w-4 h-4 inline mr-1"></i> Change Password
+                    </button>
+                    <button id="logout-btn"
+                        class="btn btn-ghost text-red-600 hover:bg-red-50 w-full rounded-xl font-medium">
+                        <i data-lucide="log-out" class="w-4 h-4 inline mr-1"></i> Logout
+                    </button>
+                </div>
 
-        </div>
+            </div>
     </main>
 
     <!-- Ouvrir l'image du profil -->
@@ -311,6 +368,7 @@
     </script>
     <!-- <script src="/script/index.js"></script> -->
     <script src="/script/test.js"></script>
+    <script src="/script/theme.js"></script>
 </body>
 
 </html>
