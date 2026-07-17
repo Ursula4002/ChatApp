@@ -35,4 +35,4 @@ export const config = {
 3. **Lancer le projet**
 Comme le projet utilise des modules JavaScript (type="module"), vous ne pouvez pas simplement ouvrir le fichier HTML dans le navigateur. Utilisez une extension comme Live Server sur VS Code pour lancer le projet en local.
 
-Lien de démonstration :
+Lien de démonstration : https://ursula4002.github.io/ChatApp/
