@@ -217,7 +217,7 @@ if (loginForm) {
 
             if (response.ok && result.success) {
                 const token = result.data.token;
-                localStorage.setItem("chat_jwt_token", token);
+                localStorage.setItem("chatToken", token);
 
                 showGlobalMessage("Connexion réussie !", true);
                 setTimeout(() => {

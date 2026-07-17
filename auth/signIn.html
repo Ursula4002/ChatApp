@@ -4,10 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kadea Chat</title>
+    <title>Kadea Chat - SignIn</title>
 
     <!-- Tailwind + DaisyUi -->
-
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Theme -->
@@ -35,7 +34,6 @@
 </head>
 
 <body class="min-h-screen flex items-center justify-center bg-gray-50">
-
     <div class="w-full max-w-sm">
 
         <!-- Logo -->
@@ -50,16 +48,13 @@
 
         <div class="card bg-white shadow-sm">
             <div class="card-body">
-                <!-- <h2 class="text-2xl font-semibold">Create Account</h2> -->
                 <p class="text-sm text-gray-500 mb-3">Please enter your details to sign in to Kadea Chat</p>
 
                 <!-- Zone d'alerte globale pour l'API -->
                 <div id="globalAlert" class="alert alert-error hidden text-sm p-2 mb-3"></div>
 
                 <form id="loginForm" novalidate>
-
                     <!-- Email -->
-
                     <label class="label"><span class="label-text">Email Address</span></label>
                     <label class="input flex items-center gap-2">
                         <i data-lucide="mail" class="w-4 h-4 text-gray-400"></i>
@@ -68,7 +63,6 @@
                     <span id="error-email" class="text-error text-xs mt-1 block"></span>
 
                     <!-- Password -->
-
                     <div class="flex items-center justify-between px-1">
                         <label class="label"><span class="label-text">Password</span></label>
                         <a href="#" class="text-xs font-medium text-primary hover:underline">Forgot?</a>
@@ -81,6 +75,7 @@
                             <i data-lucide="eye" class="w-4 h-4"></i>
                         </button>
                     </label>
+                    <!-- Message d'erreur -->
                     <span id="error-password" class="text-error text-xs mt-1 block"></span>
 
                     <label class="label">
@@ -106,26 +101,20 @@
     </div>
 
     <script type="module" src="/script/auth.js"></script>
-    <script src="/script/index.js"></script>
+
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         lucide.createIcons();
 
         function toggle(id) {
-
             const input = document.getElementById(id);
-
             input.type = input.type === "password" ? "text" : "password";
-
         }
-
+        // Pareil pour la logique, même logique juste pour un seul champ. Get the element then 
+        // add the listener on it
         document
             .getElementById("togglePassword")
             .onclick = () => toggle("password");
-
-        // document
-        //     .getElementById("toggleConfirm")
-        //     .onclick = () => toggle("confirmPassword");
     </script>
 </body>
 

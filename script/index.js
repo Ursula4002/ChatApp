@@ -1,224 +1,23 @@
-
-const API_BASE_URL = "https://kadea-chat-api.onrender.com";
-const API_KEY = "wksp_c7f8367d338d051ae4fbfe357909497a";
-const USER_TOKEN = localStorage.getItem("chat_jwt_token");
-
-async function fetchConnectedUser() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/me`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "x-api-key": API_KEY,
-                "Authorization": `Bearer ${USER_TOKEN}`
-            }
-        });
-        const result = await response.json();
-
-        console.log("--- MY USERS RESULT (fetchConnected ---");
-        console.log(result);
-
-        // Display user
-
-        const connectedUser = result.data?.user
-
-        // console.log("Mes utilisateurs :", users);
-        // console.log(users?.data.users);
-
-        console.log("------------------------------------");
-        // const initial = user && user.name ? user.name.trim().charAt(0).toUpperCase() : "?";
-
-
-        const connectedUserContainer = document.getElementById('connectedUser-container');
-        const connectedUserCard = document.createElement('div')
-
-
-        connectedUserCard.innerHTML = `
-                                    <div class="flex items-center gap-3">
-                <div class="relative w-10 h-10">
-                    <img class="w-full h-full rounded-full object-cover"
-                        src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-                        alt="Alex Rivera" />
-                    <span
-                        class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-success ring-2 ring-white"></span>
-                </div>
-                <div>
-                    <h2 class="font-semibold text-sm leading-tight">${connectedUser.fullName}</h2>
-                    <span class="text-xs text-base-content/50">My Status: Active</span>
-                </div>
-            </div>
-            <button class="btn btn-ghost btn-sm btn-square text-base-content/70">
-                <i data-lucide="square-pen" class="w-4 h-4"></i>
-            </button>
-            `
-        connectedUserContainer.appendChild(connectedUserCard);
-
-    } catch (error) {
-        console.error("Fetch failed:", error);
-    }
-}
-
-fetchConnectedUser()
-
-console.log("----------------------------------------------");
-
-
-
-async function fetchUsers() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/users`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "x-api-key": API_KEY,
-                "Authorization": `Bearer ${USER_TOKEN}`
-            }
-        });
-        const result = await response.json();
-        console.log("--- MY USERS RESULT ---");
-        console.log(result);
-
-        // Display user
-
-        const users = result.data?.users
-
-        console.log("Mes utilisateurs :", users);
-        // console.log(users?.data.users);
-
-        console.log("------------------------------------");
-
-        users.map(user => {
-            const userProfileContainer = document.getElementById('userProfile-container');
-            const userProfileCard = document.createElement('div')
-
-            // const initial = user && user.name ? user.name.trim().charAt(0).toUpperCase() : "?";
-
-            userProfileCard.innerHTML = `
-                        <div class="flex items-center gap-3 p-3 rounded-xl bg-blue-50/70 cursor-pointer border border-blue-100/50">
-                <div class="avatar">
-                    <div class="w-11 rounded-full">
-                        <img src="${user?.avatarUrl}"
-                            alt="Sarah Connor" />
-                    </div>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center justify-between mb-0.5">
-                        <span class="font-semibold text-sm">${user?.fullName}</span>
-                        <span class="text-[10px] text-primary font-medium">14:20</span>
-                    </div>
-                    <p class="text-xs text-base-content/70 truncate">Yeah, that sounds like a great plan!</p>
-                </div>
-                <div
-                    class="badge badge-primary badge-sm text-[10px] h-5 w-5 font-bold rounded-full p-0 flex items-center justify-center">
-                    2</div>
-            </div>
-            `
-            userProfileContainer.appendChild(userProfileCard);
-        }
-        )
-
-
-    } catch (error) {
-        console.error("Fetch failed:", error);
-    }
-}
-
-fetchUsers();
-
-
-// /conversations
-
-async function getConversation() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/conversations`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "x-api-key": API_KEY,
-                "Authorization": `Bearer ${USER_TOKEN}`
-            }
-        });
-        const result = await response.json();
-        console.log("--- MY CONVERSATIONS RESULT ---");
-        console.log(result);
-
-        // Display user
-
-        const users = result
-
-    } catch (error) {
-        console.error("Fetch failed:", error);
-    }
-}
-
-getConversation()
-
-// Send message
-
-async function sendMessage(message, time) {
-    const messagesContainer = document.getElementById('messages-container');
-    const sendMessageInput = document.getElementById('send-message-input');
-    const sendMessageBtn = document.getElementById('send-message-btn');
-
-    sendMessageBtn.addEventListener('click', () => {
-        const text = sendMessageInput.value.trim();
-
-        console.log("---------------Inputfield value-------------------------");
-
-        console.log(text);
-    });
-}
-
-sendMessage()
-
-// async function testFetchConversations() {
-//     try {
-//         const response = await fetch(`${API_BASE_URL}/users`, {
-//             method: "GET",
-//             headers: {
-//                 "Content-Type": "application/json",
-//                 "x-api-key": API_KEY,
-//                 "Authorization": `Bearer ${USER_TOKEN}`
-//             }
-//         });
-//         const result = await response.json();
-//         console.log("--- MY USERS RESULT ---");
-//         console.log(result);
-//     } catch (error) {
-//         console.error("Fetch failed:", error);
-//     }
-// }
-
-// testFetchConversations();
-
-
-// -----------------------------------------------------------------------
-// --------------------------------------------------------------------------
-
-
 import { config } from './config.js';
-
 
 // ==================== CONFIGURATION GLOBALE ====================
 
-// Utilisation de l'objet externe global 'config'
 const API_BASE_URL = config.API_BASE_URL;
 const API_KEY = config.API_KEY;
 const USER_TOKEN = localStorage.getItem("chatToken");
 
-// Identifiant de session pour la discussion active
 let currentConversationId = null;
+let activePeerUserId = null;
 let localConnectedUserCache = null;
+
+let lastMessagesCache = {};
+let lastMessagesDatesCache = {};
 
 const globalHeaders = {
     "Content-Type": "application/json",
     "x-api-key": API_KEY,
     "Authorization": `Bearer ${USER_TOKEN}`
 };
-
-// ==========================================
-// POUVOIR DE SÉCURITÉ : VÉRIFICATION DU TOKEN
-// ==========================================
 
 if (!USER_TOKEN) {
     console.warn("[SÉCURITÉ] Aucun token trouvé. Redirection vers la page de connexion.");
@@ -227,21 +26,22 @@ if (!USER_TOKEN) {
 
 // ==================== FONCTIONS UTILITAIRES ====================
 
-/**
- * Centralisation des requêtes Fetch vers l'API Kadea
- */
 async function apiRequest(endpoint, method = "GET", body = null) {
     try {
         const configReq = { method, headers: globalHeaders };
         if (body) configReq.body = JSON.stringify(body);
 
         const response = await fetch(`${API_BASE_URL}${endpoint}`, configReq);
-        const data = await response.json();
 
+        if (response.status === 429) {
+            console.warn(`[RATE LIMIT] Trop de requêtes sur l'endpoint ${endpoint}.`);
+            return { success: false, status: 429, message: "Trop de requêtes." };
+        }
+
+        const data = await response.json();
         if (!data.hasOwnProperty('success')) {
             data.success = response.ok;
         }
-
         return data;
     } catch (error) {
         console.error(`[ERREUR API] Sur l'endpoint ${endpoint} :`, error);
@@ -250,29 +50,108 @@ async function apiRequest(endpoint, method = "GET", body = null) {
 }
 
 /**
- * Filtre dynamique de la liste des conversations en local
+ * Affiche un loader dans le conteneur des messages pendant le chargement
  */
+function showMessagesLoader() {
+    const messagesContainer = document.getElementById('messages-container');
+    if (!messagesContainer) return;
+
+    messagesContainer.innerHTML = `
+        <div class="flex-1 flex flex-col items-center justify-center gap-3 m-auto">
+            <span class="loading loading-spinner loading-md text-primary"></span>
+            <span class="text-xs text-base-content/50 font-medium">Chargement des messages...</span>
+        </div>
+    `;
+}
+
+/**
+ * Affiche un loader dans la liste des utilisateurs à gauche
+ */
+function showUsersLoader() {
+    const userProfileContainer = document.getElementById('userProfile-container');
+    if (!userProfileContainer) return;
+
+    userProfileContainer.innerHTML = `
+        <div class="flex flex-col items-center justify-center p-8 gap-2">
+            <span class="loading loading-spinner loading-sm text-primary"></span>
+            <span class="text-[11px] text-base-content/40">Synchronisation des contacts...</span>
+        </div>
+    `;
+}
+
 function setupUserFilter() {
     const searchInput = document.getElementById('search-input');
-    if (!searchInput) return;
+    const container = document.getElementById('userProfile-container');
+    if (!searchInput || !container) return;
+
+    // On crée ou récupère un élément pour le message d'erreur
+    let emptyMessage = document.getElementById('search-empty-message');
+    if (!emptyMessage) {
+        emptyMessage = document.createElement('div');
+        emptyMessage.id = 'search-empty-message';
+        emptyMessage.className = 'text-center text-xs text-base-content/40 p-4 hidden';
+        emptyMessage.textContent = 'Aucun utilisateur trouvé';
+        container.parentNode.appendChild(emptyMessage); // Ajouté sous le conteneur
+    }
 
     searchInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase().trim();
         const userCards = document.querySelectorAll('#userProfile-container > div');
+        let hasResults = false;
 
         userCards.forEach(card => {
             const nameSpan = card.querySelector('.font-semibold.text-sm');
             if (nameSpan) {
                 const userName = nameSpan.textContent.toLowerCase();
-                card.style.display = userName.includes(searchTerm) ? 'flex' : 'none';
+                // card.style.display = userName.includes(searchTerm) ? 'flex' : 'none';
+                const matches = userName.includes(searchTerm);
+                card.style.display = matches ? 'flex' : 'none';
+                if (matches) hasResults = true;
             }
         });
+
+        // Affiche ou masque le message "user not found"
+        if (!hasResults && searchTerm !== "") {
+            emptyMessage.classList.remove('hidden');
+        } else {
+            emptyMessage.classList.add('hidden');
+        }
     });
 }
 
 /**
- * Extrait un maximum de deux initiales d'un nom complet
+ * OPTIMISÉE : Remplit le cache intelligemment sans saturer le réseau
  */
+async function fetchConversationsAndCacheMessages() {
+    const result = await apiRequest("/conversations");
+    const conversations = result.data?.conversations || result.data || [];
+    const myId = localStorage.getItem("chat_user_id");
+
+    lastMessagesCache = {};
+    lastMessagesDatesCache = {};
+
+    // On parcourt les conversations reçues de l'API
+    conversations.forEach(conv => {
+        // Option A: Si l'API fournit les participants directement
+        let peer = conv.participants?.find(p => p.id !== myId);
+
+        // Option B: Si pas de participants structurés, on extrait le nom depuis le titre du Chat (ex: "Chat avec testeur2")
+        let peerName = null;
+        if (!peer && conv.name && conv.name.includes("Chat avec ")) {
+            peerName = conv.name.replace("Chat avec ", "").trim();
+        }
+
+        if (conv.lastMessage) {
+            // Si l'API nous donne directement le dernier message dans la conversation
+            const peerId = peer?.id || conv.lastMessage.senderId;
+            if (peerId && peerId !== myId) {
+                lastMessagesCache[peerId] = conv.lastMessage.content;
+                lastMessagesDatesCache[peerId] = conv.lastMessage.createdAt || conv.lastMessage.updatedAt;
+            }
+        }
+    });
+}
+
 function getInitials(fullName) {
     if (!fullName) return "?";
     const words = fullName.trim().split(/\s+/);
@@ -280,9 +159,6 @@ function getInitials(fullName) {
     return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
 }
 
-/**
- * Génère la structure HTML d'un avatar (Image ou bloc initiales)
- */
 function createAvatarTemplate(avatarUrl, fullName, sizeClass = "w-11 h-11") {
     if (avatarUrl) {
         return `<img class="w-full h-full rounded-full object-cover" src="${avatarUrl}" alt="Avatar" />`;
@@ -294,112 +170,118 @@ function createAvatarTemplate(avatarUrl, fullName, sizeClass = "w-11 h-11") {
     `;
 }
 
+function formatLastMessageDate(dateString) {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const now = new Date();
+
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (date.toDateString() === now.toDateString()) {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (diffDays === 1) {
+        return "Hier";
+    } else {
+        return date.toLocaleDateString([], { day: '2-digit', month: '2-digit' });
+    }
+}
+
 // ==================== LOGIQUE NAVIGATION & RESPONSIVE ====================
 
-/**
- * Gère le basculement d'affichage des panneaux et des vues (Responsive & Thème)
- */
 function switchView(viewName) {
-    console.log(`[NAVIGATION] Basculement vers l'affichage : ${viewName}`);
-    
-    const sidebarContainer = document.querySelector('section'); // Liste des conversations
+    const asideBar = document.querySelector('aside');
+    const sidebarContainer = document.querySelector('section');
     const chatView = document.getElementById('chat-view');
     const profileView = document.getElementById('profile-view');
-    
+    const chatFooter = document.getElementById('chat-footer');
+
     const settingsBtn = document.getElementById('settings-btn');
     const chatTabBtn = document.querySelector('aside button:nth-child(2)');
 
-    // Nettoyage des états actifs des boutons de la barre latérale
     if (settingsBtn) settingsBtn.classList.remove('text-primary', 'bg-primary/10', 'rounded-xl');
     if (chatTabBtn) chatTabBtn.classList.remove('text-primary', 'bg-primary/10', 'rounded-xl');
 
+    const isMobile = window.innerWidth < 768;
+
     if (viewName === 'profile') {
-        // Masquer le chat et la liste des contacts, afficher le profil
-        if (chatView) chatView.classList.add('hidden');
-        if (sidebarContainer) sidebarContainer.classList.add('hidden', 'md:flex');
+        if (chatView) {
+            chatView.classList.add('hidden');
+            chatView.classList.remove('flex', 'md:flex');
+        }
         if (profileView) profileView.classList.remove('hidden');
-        
+
+        if (isMobile) {
+            if (sidebarContainer) sidebarContainer.classList.add('hidden');
+            if (asideBar) asideBar.classList.remove('hidden');
+        } else {
+            if (sidebarContainer) sidebarContainer.classList.remove('hidden');
+            if (asideBar) asideBar.classList.remove('hidden');
+        }
+
         if (settingsBtn) settingsBtn.classList.add('text-primary', 'bg-primary/10', 'rounded-xl');
         populateProfileForm();
-    } else if (viewName === 'chat') {
-        // Mode discussion
+    }
+    else if (viewName === 'chat') {
         if (profileView) profileView.classList.add('hidden');
-        
-        // Sur mobile : si une conversation est active, on affiche le chat, sinon la liste
+
         if (currentConversationId) {
-            if (sidebarContainer) sidebarContainer.classList.add('hidden');
+            if (isMobile) {
+                if (sidebarContainer) sidebarContainer.classList.add('hidden');
+                if (asideBar) asideBar.classList.add('hidden');
+            } else {
+                if (sidebarContainer) sidebarContainer.classList.remove('hidden');
+                if (asideBar) asideBar.classList.remove('hidden');
+            }
+
             if (chatView) {
                 chatView.classList.remove('hidden');
                 chatView.classList.add('flex');
             }
-        } else {
-            if (sidebarContainer) sidebarContainer.classList.remove('hidden');
-            if (chatView) {
-                chatView.classList.add('hidden');
-                chatView.classList.remove('flex');
-            }
+            if (chatFooter) chatFooter.classList.remove('hidden');
         }
-        
         if (chatTabBtn) chatTabBtn.classList.add('text-primary', 'bg-primary/10', 'rounded-xl');
-    } else if (viewName === 'list') {
-        // Spécifique Mobile : Retourner à la liste des contacts
+    }
+    else if (viewName === 'list') {
         if (profileView) profileView.classList.add('hidden');
         if (chatView) {
             chatView.classList.add('hidden');
-            chatView.classList.remove('flex');
+            chatView.classList.remove('flex', 'md:flex');
         }
         if (sidebarContainer) sidebarContainer.classList.remove('hidden');
+        if (asideBar) asideBar.classList.remove('hidden');
         if (chatTabBtn) chatTabBtn.classList.add('text-primary', 'bg-primary/10', 'rounded-xl');
     }
 }
 
-/**
- * Configure les écouteurs pour la navigation mobile et le changement de thème
- */
-function setupResponsiveAndThemeLogic() {
-    // Bouton de retour sur le header du chat (Mobile)
+function setupResponsiveLogic() {
     const backBtn = document.getElementById('back-to-list-btn');
     if (backBtn) {
         backBtn.addEventListener('click', () => switchView('list'));
-    }
-
-    // Gestion manuelle des thèmes (DaisyUI / Tailwind)
-    const htmlEl = document.documentElement;
-    const lightBtn = document.getElementById('theme-light-btn');
-    const darkBtn = document.getElementById('theme-dark-btn');
-
-    if (lightBtn) {
-        lightBtn.addEventListener('click', () => {
-            htmlEl.setAttribute('data-theme', 'light');
-            console.log("[THÈME] Passage au mode Clair");
-        });
-    }
-
-    if (darkBtn) {
-        darkBtn.addEventListener('click', () => {
-            htmlEl.setAttribute('data-theme', 'dark');
-            console.log("[THÈME] Passage au mode Sombre");
-        });
     }
 }
 
 // ==================== LOGIQUE APPLICATIVE CHAT ====================
 
-/**
- * 1. Récupère et affiche le profil de l'utilisateur connecté
- */
 async function fetchConnectedUser() {
-    const result = await apiRequest("/auth/me");
-    console.log("Données Utilisateur Connecté (/auth/me) :", result);
+    if (localConnectedUserCache) {
+        displayConnectedUser(localConnectedUserCache);
+        return;
+    }
 
+    const result = await apiRequest("/auth/me");
     if (result && result.success && result.data?.user) {
         const connectedUser = result.data.user;
         localConnectedUserCache = connectedUser;
         localStorage.setItem("chat_user_id", connectedUser.id);
+        displayConnectedUser(connectedUser);
+    }
+}
 
-        const connectedUserContainer = document.getElementById('connectedUser-container');
-        if (connectedUserContainer) {
-            connectedUserContainer.innerHTML = `
+async function displayConnectedUser(connectedUser) {
+    const connectedUserContainer = document.getElementById('connectedUser-container');
+    if (connectedUserContainer) {
+        connectedUserContainer.innerHTML = `
                 <div class="flex items-center gap-3 cursor-pointer">
                     <div class="relative w-10 h-10 flex items-center justify-center">
                         ${createAvatarTemplate(connectedUser.avatarUrl, connectedUser.fullName, "w-10 h-10")}
@@ -415,45 +297,46 @@ async function fetchConnectedUser() {
                 </button> 
             `;
 
-            if (window.lucide) {
-                window.lucide.createIcons();
-            }
+        if (window.lucide) {
+            window.lucide.createIcons();
         }
-        
-        if (!document.getElementById('profile-view').classList.contains('hidden')) {
-            populateProfileForm();
-        }
+    }
+
+    if (!document.getElementById('profile-view').classList.contains('hidden')) {
+        populateProfileForm();
     }
 }
 
-/**
- * 2. Récupère et affiche la liste des utilisateurs du workspace
- */
 async function fetchUsers() {
     const result = await apiRequest("/users");
-    console.log("Liste des Utilisateurs (/users) :", result);
-
     const userProfileContainer = document.getElementById('userProfile-container');
     if (!userProfileContainer) return;
 
-    userProfileContainer.innerHTML = '';
     const users = result.data?.users || result.data || [];
 
+    // Si c'est le premier chargement (vide), on enlève le loader
+    userProfileContainer.innerHTML = '';
+
     users.forEach(user => {
-        // Ne pas s'afficher soi-même dans la liste des contacts
         if (user.id === localStorage.getItem("chat_user_id")) return;
 
         const userProfileCard = document.createElement('div');
         userProfileCard.className = "flex items-center gap-3 p-3 rounded-xl hover:bg-base-200/50 cursor-pointer transition-colors";
 
+        if (user.id === activePeerUserId) {
+            userProfileCard.classList.add('bg-base-200/70', 'border', 'border-base-content/10');
+        }
+
         userProfileCard.addEventListener('click', (e) => {
             handleUserClick(user.id, user.fullName, user.avatarUrl, userProfileCard);
         });
 
-        const avatarClass = user.avatarUrl ? "w-11 rounded-full" : "avatar placeholder";
-        const avatarContent = user.avatarUrl 
+        const avatarContent = user.avatarUrl
             ? `<div class="w-11 rounded-full"><img src="${user.avatarUrl}" alt="${user.fullName}" /></div>`
             : `<div class="bg-primary/10 text-primary rounded-full w-11 h-11 flex items-center justify-center font-semibold text-sm">${getInitials(user.fullName)}</div>`;
+
+        const lastMessage = lastMessagesCache[user.id] || "Cliquez pour commencer à discuter";
+        const messageDate = lastMessagesDatesCache[user.id] ? formatLastMessageDate(lastMessagesDatesCache[user.id]) : "";
 
         userProfileCard.innerHTML = `
             <div class="${user.avatarUrl ? 'avatar' : ''}">
@@ -462,20 +345,16 @@ async function fetchUsers() {
             <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between mb-0.5">
                     <span class="font-semibold text-sm text-base-content">${user.fullName}</span>
-                    <span class="text-[10px] text-base-content/40">Statut</span>
+                    <span class="text-[10px] text-base-content/40 font-medium">${messageDate}</span>
                 </div>
-                <p class="text-xs text-base-content/50 truncate">Cliquez pour commencer à discuter</p>
+                <p class="text-xs text-base-content/50 truncate">${lastMessage}</p>
             </div>
         `;
         userProfileContainer.appendChild(userProfileCard);
     });
 }
 
-/**
- * 3. Gère l'activation visuelle et la récupération de l'ID du salon de discussion
- */
 async function handleUserClick(peerUserId, peerName, peerAvatarUrl, clickedCard) {
-    // Gestion visuelle de la sélection active
     document.querySelectorAll('#userProfile-container > div').forEach(el => {
         el.classList.remove('bg-base-200/70', 'border', 'border-base-content/10');
     });
@@ -483,21 +362,22 @@ async function handleUserClick(peerUserId, peerName, peerAvatarUrl, clickedCard)
         clickedCard.classList.add('bg-base-200/70', 'border', 'border-base-content/10');
     }
 
-    // Création ou récupération de la conversation
+    activePeerUserId = peerUserId;
+
+    // On affiche immédiatement le loader dans la zone de chat pendant l'appel API
+    showMessagesLoader();
+    switchView('chat');
+
     const result = await apiRequest("/conversations", "POST", {
         type: "private",
         name: `Chat avec ${peerName}`,
         participantIds: [peerUserId]
     });
-    console.log("Création/Récupération Conversation (/conversations) :", result);
 
-    const conversationId = result.data?.conversation?.id || result.data?.id || result.id;
+    const conversationId = result.data?.conversation?.id;
 
     if (conversationId) {
         currentConversationId = conversationId;
-
-        // Force l'affichage de l'écran de discussion (surtout pour le Mobile)
-        switchView('chat');
 
         const chatHeader = document.getElementById('chat-header');
         const activeUserInfo = document.getElementById('active-user-info');
@@ -524,35 +404,42 @@ async function handleUserClick(peerUserId, peerName, peerAvatarUrl, clickedCard)
             chatFooter.classList.remove('hidden');
         }
 
-        fetchMessages();
+        // Récupération des messages réels
+        await fetchMessages();
     } else {
         alert("Impossible d'ouvrir la discussion.");
     }
 }
 
-/**
- * Formatage de l'heure des messages
- */
 function formatMessageTime(dateString) {
     if (!dateString) return "";
     const date = new Date(dateString);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-/**
- * 4. Récupère le flux des messages depuis le serveur
- */
 async function fetchMessages() {
     if (!currentConversationId) return;
 
     const result = await apiRequest(`/conversations/${currentConversationId}/messages`);
-    
     const messagesContainer = document.getElementById('messages-container');
     if (!messagesContainer) return;
 
     const messages = result.data?.messages || result.data || [];
 
-    // On efface uniquement si de nouveaux messages sont arrivés pour éviter les sauts visuels
+    if (messages.length === 0) {
+        messagesContainer.innerHTML = `
+            <div class="flex-1 flex flex-col items-center justify-center text-center p-8 m-auto text-base-content/40 text-sm italic">
+                Envoyez un message pour commencer à discuter
+            </div>
+        `;
+        if (activePeerUserId) {
+            delete lastMessagesCache[activePeerUserId];
+            delete lastMessagesDatesCache[activePeerUserId];
+            fetchUsers();
+        }
+        return;
+    }
+
     messagesContainer.innerHTML = '';
 
     messages.forEach(msg => {
@@ -579,12 +466,15 @@ async function fetchMessages() {
         messagesContainer.insertAdjacentHTML('beforeend', messageTemplate);
     });
 
+    if (activePeerUserId && messages.length > 0) {
+        const lastMsgObj = messages[messages.length - 1];
+        lastMessagesCache[activePeerUserId] = lastMsgObj.content;
+        lastMessagesDatesCache[activePeerUserId] = lastMsgObj.createdAt || lastMsgObj.updatedAt;
+    }
+
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-/**
- * 5. Gestion de la zone de saisie et de l'envoi
- */
 function setupMessageSending() {
     const sendMessageBtn = document.getElementById('send-message-btn');
     const sendMessageInput = document.getElementById('send-message-input');
@@ -621,10 +511,16 @@ async function executeSendMessage() {
     const result = await apiRequest(`/conversations/${currentConversationId}/messages`, "POST", {
         content: text
     });
-    console.log("Statut Envoi Message :", result);
 
     if (result && result.success) {
         inputElement.value = '';
+
+        if (activePeerUserId) {
+            lastMessagesCache[activePeerUserId] = text;
+            lastMessagesDatesCache[activePeerUserId] = new Date().toISOString();
+            fetchUsers();
+        }
+
         fetchMessages();
     } else {
         alert("Erreur lors de l'envoi : " + (result.message || "Inconnu"));
@@ -648,9 +544,6 @@ function showToast(message, type = "success") {
     setTimeout(() => { toast.remove(); }, 3000);
 }
 
-/**
- * Remplit la page profil avec les bonnes cibles HTML réelles
- */
 function populateProfileForm() {
     if (!localConnectedUserCache) return;
 
@@ -660,22 +553,21 @@ function populateProfileForm() {
     const usernameInput = document.getElementById('username-input');
 
     if (profileAvatar) {
-        profileAvatar.src = localConnectedUserCache.avatarUrl || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp";
+        profileAvatar.src = localConnectedUserCache.avatarUrl || "https://www.image2url.com/r2/default/images/1783930708557-65ccc78d-7a35-48f7-a316-405f58041f34.jpg";
     }
 
     if (displayName) displayName.textContent = localConnectedUserCache.fullName || "Utilisateur";
     if (displayEmail) displayEmail.textContent = localConnectedUserCache.email || "non-communique@kadea.co";
-    
-    // Le seul champ modifiable identifié dans ton HTML est le username
+
     if (usernameInput) {
         usernameInput.value = localConnectedUserCache.username || "";
+        // Laisse le champ activé par défaut pour l'édition directe
         usernameInput.removeAttribute('disabled');
         usernameInput.classList.remove('bg-base-200', 'cursor-not-allowed', 'text-base-content/40');
     }
 }
 
 async function uploadImageToCloudinary(file) {
-    console.log("[CLOUDINARY] Début du téléversement du fichier :", file.name);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", CLOUDINARY_PRESET);
@@ -685,7 +577,9 @@ async function uploadImageToCloudinary(file) {
         if (!response.ok) throw new Error("Échec Cloudinary");
 
         const data = await response.json();
+        console.log("----------------------: ", data);
         return data.secure_url;
+
     } catch (error) {
         console.error("[CLOUDINARY] Erreur :", error);
         showToast("Impossible d'envoyer l'image.", "error");
@@ -730,22 +624,58 @@ function setupProfileLogic() {
         });
     }
 
-    // Gestion propre et sécurisée de la Déconnexion sur événement clic
+    // ==================== CODE AJOUTÉ POUR LA LIGHTBOX ====================
+    const avatarContainer = document.querySelector('.group.cursor-pointer'); // Cible le conteneur HTML de ton avatar
+    const imageLightbox = document.getElementById('image-lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const closeLightboxBtn = document.getElementById('close-lightbox-btn');
+    const profileAvatar = document.getElementById('profile-avatar');
+
+    if (avatarContainer && imageLightbox && lightboxImg && profileAvatar) {
+        avatarContainer.addEventListener('click', () => {
+            lightboxImg.src = profileAvatar.src;
+            imageLightbox.classList.remove('hidden');
+            setTimeout(() => {
+                imageLightbox.classList.remove('opacity-0');
+                lightboxImg.classList.remove('scale-95');
+            }, 10);
+        });
+    }
+
+    const closeLightbox = () => {
+        if (!imageLightbox || !lightboxImg) return;
+        imageLightbox.classList.add('opacity-0');
+        lightboxImg.classList.add('scale-95');
+        setTimeout(() => imageLightbox.classList.add('hidden'), 300);
+    };
+
+    if (closeLightboxBtn) closeLightboxBtn.addEventListener('click', closeLightbox);
+    if (imageLightbox) {
+        imageLightbox.addEventListener('click', (e) => {
+            if (e.target === imageLightbox) closeLightbox();
+        });
+    }
+    // =====================================================================
+
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
-            console.log("[AUTH] Tentative de déconnexion...");
-            const response = await apiRequest("/auth/logout", "POST");
-            console.log("[AUTH] Réponse déconnexion :", response);
-            
             localStorage.clear();
             window.location.href = "/auth/signIn.html";
         });
     }
 }
 
+const logoutBtn = document.getElementById('logout-btn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+        localStorage.clear();
+        window.location.href = "/auth/signIn.html";
+    });
+}
+
+
 async function saveProfileData(fieldsToUpdate) {
-    console.log("[API PATCH] Envoi des modifications :", fieldsToUpdate);
     const btnText = document.getElementById('save-btn-text');
     const btnSpinner = document.getElementById('save-btn-spinner');
 
@@ -755,7 +685,6 @@ async function saveProfileData(fieldsToUpdate) {
     }
 
     const result = await apiRequest("/users/me", "PATCH", fieldsToUpdate);
-    console.log("Statut Mise à jour Profil (/users/me) :", result);
 
     if (btnText && btnSpinner) {
         btnText.classList.remove('hidden');
@@ -763,26 +692,40 @@ async function saveProfileData(fieldsToUpdate) {
     }
 
     if (result && result.success) {
-        showToast("Profil與mis à jour avec succès !");
+        showToast("Profil mis à jour avec succès !");
+        localConnectedUserCache = null;
         await fetchConnectedUser();
     } else {
         showToast("Erreur lors de la sauvegarde.", "error");
     }
 }
 
+
+
 // ==================== INITIALISATION AUTOMATIQUE ====================
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     setupUserFilter();
-    setupResponsiveAndThemeLogic();
+    setupResponsiveLogic();
     setupProfileLogic();
     setupMessageSending();
 
-    // Lancement des chargements initiaux
-    fetchConnectedUser();
-    fetchUsers();
+    // 1. Affichage immédiat d'un loader dans la liste de gauche pour l'UX
+    showUsersLoader();
 
-    // Polling de mise à jour synchronisée toutes les 4 secondes
+    // 2. On récupère l'utilisateur connecté
+    await fetchConnectedUser();
+
+    // 3. On affiche d'abord TOUS les utilisateurs (sans latence)
+    await fetchUsers();
+
+    // 4. On charge le cache des messages en arrière-plan sans bloquer l'affichage
+    fetchConversationsAndCacheMessages().then(() => {
+        // Dès que le cache est prêt, on rafraîchit la liste avec les derniers messages
+        fetchUsers();
+    });
+
+    // Polling toutes les 4 secondes pour rafraîchir la discussion active
     setInterval(() => {
         if (currentConversationId) fetchMessages();
     }, 4000);
