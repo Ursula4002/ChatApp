@@ -529,8 +529,8 @@ async function executeSendMessage() {
 
 // ==================== GESTION DU PROFIL & CLOUDINARY ====================
 
-const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/obd42wdt/image/upload";
-const CLOUDINARY_PRESET = "ih4yfg4m";
+const CLOUDINARY_URL = config.CLOUDINARY_URL;
+const CLOUDINARY_PRESET = config.CLOUDINARY_PRESET;
 
 function showToast(message, type = "success") {
     const container = document.getElementById('toast-container');
