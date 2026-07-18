@@ -21,7 +21,7 @@ const globalHeaders = {
 
 if (!USER_TOKEN) {
     console.warn("[SÉCURITÉ] Aucun token trouvé. Redirection vers la page de connexion.");
-    window.location.href = "/auth/signIn.html";
+    window.location.href = "auth/signIn.html";
 }
 
 // ==================== FONCTIONS UTILITAIRES ====================
@@ -661,7 +661,7 @@ function setupProfileLogic() {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
             localStorage.clear();
-            window.location.href = "/auth/signIn.html";
+            window.location.href = "auth/signIn.html";
         });
     }
 }
@@ -670,7 +670,7 @@ const logoutBtn = document.getElementById('logout-btn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
         localStorage.clear();
-        window.location.href = "/auth/signIn.html";
+        window.location.href = "auth/signIn.html";
     });
 }
 

@@ -221,7 +221,7 @@ if (loginForm) {
 
                 showGlobalMessage("Connexion réussie !", true);
                 setTimeout(() => {
-                    window.location.href = "/index.html";
+                    window.location.href = "../index.html";
                 }, 1500)
             } else {
                 showGlobalMessage(result.message || "Identifiants incorrects.", false);
