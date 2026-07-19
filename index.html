@@ -209,14 +209,35 @@
                                 <i class="fa-solid fa-camera text-xl mb-1"></i>
                                 <span class="text-[9px] uppercase font-bold tracking-wider text-center px-2">Voir la photo</span>
                             </div>
+
+                            <!--
+                                Le bouton est place diretement en bas à droite de lavatar avec bottom-1 et right-1.
+                                Auparavant, translate-x-16 le déplaçait vers la droite, mais DaisyUI utilise aussi une
+                                transformation pour son animation au clic. Les deux effets entrer en conflit et le
+                                bouton sautait momentanément sur le côté. Ce positionnement fixe évite ce conflit.
+                                stopPropagation() empeche également le clic de remonter jusqu'à l'avatar et d'ouvrir
+                                aperçu de la photo lorsque le user veut seulement choisir une nouvelle image
+                            -->
+                            <button type="button"
+                                onclick="event.stopPropagation(); document.getElementById('avatar-file-input').click()"
+                                class="btn btn-circle btn-xs btn-primary absolute bottom-1 right-1 shadow-md">
+                                <i data-lucide="camera" class="w-3 h-3 text-white"></i>
+                            </button>
+
+                            <!-- LE PROBLEME
+                                Ce bouton etait positionn depuis le milieu du conteneur, puis poussé de 64 px
+                                a droite avec translate-x-16. comme DaisyUI applique aussi une transformation
+                                pendant le clic avec sa classe btn qui ajute souvent la propriete transform-..., ce déplacement pouvait disparaître brièvement et faire sauter le bouton.
+
+                                <button onclick="document.getElementById('avatar-file-input').click()"
+                                    class="btn btn-circle btn-xs btn-primary absolute top-28 right-1/2 translate-x-16 shadow-md">
+                                    <i data-lucide="camera" class="w-3 h-3 text-white"></i>
+                                </button>
+                            -->
                         </div>
                     </div>
 
                     <input type="file" id="avatar-file-input" accept="image/*" class="hidden" />
-                    <button onclick="document.getElementById('avatar-file-input').click()"
-                        class="btn btn-circle btn-xs btn-primary absolute top-28 right-1/2 translate-x-16 shadow-md">
-                        <i data-lucide="camera" class="w-3 h-3 text-white"></i>
-                    </button>
 
                     <div>
                         <h1 class="text-lg font-bold text-base-content" id="profile-display-name">---</h1>
