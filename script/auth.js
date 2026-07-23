@@ -232,3 +232,36 @@ if (loginForm) {
         }
     });
 }
+
+// ==================== FONCTIONNALITÉ : MOT DE PASSE OUBLIÉ ====================
+async function executeForgotPassword(email) {
+    if (!email) {
+        showToast("Veuillez entrer votre adresse email.", "error");
+        return;
+    }
+
+    console.log(`[ACTION] Demande de code pour : ${email}`);
+
+    const response = await fetch(`${config.API_BASE_URL}/auth/forgot-password`);
+
+    const result = await response.json();
+    console.log("[API RESPONSE] Forgot Password :", result);
+
+    if (result.success) {
+        showToast("Code à 6 chiffres envoyé avec succès !", "success");
+    } else {
+        showToast(result.message || "Erreur lors de l'envoi du code.", "error");
+    }
+}
+
+const forgotPasswordBtn = document.getElementById("forgot-password");
+if (forgotPasswordBtn) {
+    forgotPasswordBtn.addEventListener("click", async (event) => {
+        event.preventDefault();
+        // const email = prompt("Veuillez entrer votre adresse email :");
+        const email = showToast("Veuillez entrer votre adresse email :", "info", true);
+        if (email) {
+            await executeForgotPassword(email);
+        }
+    });
+}
