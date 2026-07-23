@@ -314,6 +314,8 @@ async function fetchUsers() {
 
     const users = result.data?.users || result.data || [];
 
+    console.log(users)
+
     // Si c'est le premier chargement (vide), on enlève le loader
     userProfileContainer.innerHTML = '';
 
@@ -551,6 +553,7 @@ function populateProfileForm() {
     const displayName = document.getElementById('profile-display-name');
     const displayEmail = document.getElementById('profile-display-email');
     const usernameInput = document.getElementById('username-input');
+    const profileDisplayDate = document.getElementById('profile-display-date');
 
     if (profileAvatar) {
         profileAvatar.src = localConnectedUserCache.avatarUrl || "https://www.image2url.com/r2/default/images/1783930708557-65ccc78d-7a35-48f7-a316-405f58041f34.jpg";
@@ -558,6 +561,18 @@ function populateProfileForm() {
 
     if (displayName) displayName.textContent = localConnectedUserCache.fullName || "Utilisateur";
     if (displayEmail) displayEmail.textContent = localConnectedUserCache.email || "non-communique@kadea.co";
+
+    // const createdAtDate = localConnectedUserCache.createdAt ? new Date(localConnectedUserCache.createdAt) : null;
+    const createdAtDate = localConnectedUserCache.createdAt ? new Date(localConnectedUserCache.createdAt) : null;
+    const options = { year: 'numeric', month: 'long' };
+    const formattedDate = createdAtDate ? createdAtDate.toLocaleDateString('en-US', options) : "";
+    // const formattedDate = createdAtDate ? createdAtDate.toLocaleDateString('fr-FR', options) : "October 2023";
+
+    console.log(formattedDate)
+
+    if(profileDisplayDate) profileDisplayDate.innerHTML = `<i data-lucide="shield-check" class="w-3 h-3 mr-1"></i> Member since ${formattedDate || "October 2023"}`;
+    // if(profileDisplayDate) profileDisplayDate.innerHTML = `<i data-lucide="shield-check" class="w-3 h-3 mr-1"></i> Member since ${localConnectedUserCache.createdAt || "October 2023"}`;
+    // if(profileDisplayDate) profileDisplayDate.textContent = localConnectedUserCache.createdAt || "Member since October 2023";
 
     if (usernameInput) {
         usernameInput.value = localConnectedUserCache.username || "";
