@@ -33,6 +33,13 @@ async function apiRequest(endpoint, method = "GET", body = null) {
 
         const response = await fetch(`${API_BASE_URL}${endpoint}`, configReq);
 
+        if (response.status === 401) {
+            console.error("[SÉCURITÉ] Token invalide ou expiré (401). Nettoyage et redirection...");
+            localStorage.clear();
+            window.location.href = "auth/signIn.html";
+            return { success: false, status: 401, message: "Session expirée." };
+        }
+
         if (response.status === 429) {
             console.warn(`[RATE LIMIT] Trop de requêtes sur l'endpoint ${endpoint}.`);
             return { success: false, status: 429, message: "Trop de requêtes." };
@@ -427,6 +434,8 @@ async function fetchMessages() {
     if (!messagesContainer) return;
 
     const messages = result.data?.messages || result.data || [];
+    console.log(messages);
+    
 
     if (messages.length === 0) {
         messagesContainer.innerHTML = `
@@ -444,15 +453,33 @@ async function fetchMessages() {
 
     messagesContainer.innerHTML = '';
 
+    
     messages.forEach(msg => {
+        const msgId = msg.id || msg._id;
+        console.log(msgId);
+        
         const isMe = msg.senderId === localStorage.getItem("chat_user_id");
         const formattedTime = formatMessageTime(msg.createdAt || msg.updatedAt);
 
+        // Messages avec un menu d'action rapide DaisyUI (Dropdown)
+        // <div id="bubble-${msg.id}" class="chat-bubble bg-primary text-primary-content text-sm rounded-2xl px-4 py-2.5 shadow-sm relative">
         const messageTemplate = isMe ? `
-            <div class="flex flex-col items-end gap-2 max-w-[85%] ml-auto">
+            <div class="flex flex-col items-end gap-2 max-w-[85%] ml-auto group relative">
                 <div class="chat chat-end w-full">
-                    <div class="chat-bubble bg-primary text-primary-content text-sm rounded-2xl px-4 py-2.5 shadow-sm">
+                    <div id="bubble-${msgId}" class="chat-bubble bg-primary text-primary-content text-sm rounded-2xl px-4 py-2.5 shadow-sm relative">
                         ${msg.content}
+                        
+                        <!-- Options du message (DaisyUI Dropdown) -->
+                        <div class="dropdown dropdown-left dropdown-end absolute top-1/2 -translate-y-1/2 -left-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <label tabindex="0" class="btn btn-ghost btn-xs btn-circle text-base-content/50">
+                                <span class="text-lg">⋮</span>
+                            </label>
+                            <ul tabindex="0" class="dropdown-content menu p-1 shadow-lg bg-base-100 rounded-box w-28 text-xs text-base-content z-50">
+                                <li><a class="edit-msg-btn text-info" data-id="${msgId}" data-content="${msg.content}">Modifier</a></li>
+                                <li><a class="delete-msg-btn text-error" data-id="${msgId}">Supprimer</a></li>
+                            </ul>
+                        </div>
+
                     </div>
                     <div class="chat-footer opacity-40 text-[10px] mt-1 pr-1 w-full text-right">${formattedTime}</div>
                 </div>
@@ -466,6 +493,22 @@ async function fetchMessages() {
             </div>
         `;
         messagesContainer.insertAdjacentHTML('beforeend', messageTemplate);
+    });
+
+    // Écouteurs d'événements dynamiques pour Modifier/Supprimer après injection du HTML
+    document.querySelectorAll('.edit-msg-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = e.target.getAttribute('data-id');
+            const content = e.target.getAttribute('data-content');
+            executeEditMessage(id, content);
+        });
+    });
+
+    document.querySelectorAll('.delete-msg-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = e.target.getAttribute('data-id');
+            executeDeleteMessage(id);
+        });
     });
 
     if (activePeerUserId && messages.length > 0) {
@@ -529,6 +572,97 @@ async function executeSendMessage() {
     }
 }
 
+
+// ==================== FONCTIONNALITÉ : MODIFIER UN MESSAGE ====================
+async function executeEditMessage(messageId, currentContent) {
+    // 1. On cherche la bulle du message dans le DOM pour la transformer en formulaire
+    const msgBubble = document.getElementById(`bubble-${messageId}`);
+    console.error(`[ERREUR EDIT] Aucun élément trouvé dans le DOM avec l'ID "bubble-${messageId}"`);
+    if (!msgBubble) return;
+
+    // Sauvegarde du HTML d'origine au cas où l'utilisateur annule
+    const originalHTML = msgBubble.innerHTML;
+
+    // On injecte un input et des petits boutons DaisyUI à la place du texte
+    msgBubble.innerHTML = `
+        <div class="flex flex-col gap-2 min-w-[200px]">
+            <input type="text" id="edit-input-${messageId}" class="input input-bordered input-sm text-base-content w-full" value="${currentContent.replace(/"/g, '&quot;')}">
+            <div class="flex justify-end gap-1">
+                <button class="btn btn-ghost btn-xs text-white cancel-edit-btn">Annuler</button>
+                <button class="btn btn-success btn-xs text-white save-edit-btn">Enregistrer</button>
+            </div>
+        </div>
+    `;
+
+    // Gestion de l'annulation
+    msgBubble.querySelector('.cancel-edit-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        msgBubble.innerHTML = originalHTML;
+        // On relie les écouteurs du dropdown qui ont sauté lors du reset HTML
+        fetchMessages();
+    });
+
+    // Gestion de la sauvegarde
+    msgBubble.querySelector('.save-edit-btn').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const inputVal = document.getElementById(`edit-input-${messageId}`).value.trim();
+
+        if (!inputVal) {
+            showToast("Le message ne peut pas être vide.", "error");
+            return;
+        }
+
+        console.log(`[ACTION] Modification du message ${messageId} -> ${inputVal}`);
+        const result = await apiRequest(`/messages/${messageId}`, "PATCH", { content: inputVal });
+        console.log("[API RESPONSE] Modification message :", result);
+
+        if (result && result.success) {
+            showToast("Message modifié avec succès !");
+            await fetchMessages();
+            await fetchConversationsAndCacheMessages();
+            fetchUsers();
+        } else {
+            showToast(result.message || "Impossible de modifier.", "error");
+        }
+    });
+}
+
+// ==================== FONCTIONNALITÉ : SUPPRIMER UN MESSAGE ====================
+// async function executeDeleteMessage(messageId) {
+//     if (!confirm("Voulez-vous vraiment supprimer ce message ?")) return;
+
+//     console.log(`[ACTION] Tentative de suppression du message ID: ${messageId}`);
+
+//     const result = await apiRequest(`/messages/${messageId}`, "DELETE");
+
+//     console.log("[API RESPONSE] Suppression message :", result);
+
+//     if (result && result.success) {
+//         showToast("Message supprimé.");
+//         await fetchMessages(); // Rafraîchit l'affichage
+//         await fetchConversationsAndCacheMessages(); // Met à jour le cache
+//         fetchUsers(); // Actualise la liste de gauche
+//     } else {
+//         alert("Impossible de supprimer le message : " + (result.message || "Erreur inconnue"));
+//     }
+// }
+
+async function executeDeleteMessage(messageId) {
+    console.log(`[ACTION] Suppression du message ID: ${messageId}`);
+
+    const result = await apiRequest(`/messages/${messageId}`, "DELETE");
+    console.log("[API RESPONSE] Suppression message :", result);
+
+    if (result && result.success) {
+        showToast("Message supprimé avec succès.");
+        await fetchMessages();
+        await fetchConversationsAndCacheMessages();
+        fetchUsers();
+    } else {
+        showToast(result.message || "Erreur de suppression.", "error");
+    }
+}
+
 // ==================== GESTION DU PROFIL & CLOUDINARY ====================
 
 const CLOUDINARY_URL = config.CLOUDINARY_URL;
@@ -570,15 +704,17 @@ function populateProfileForm() {
 
     console.log(formattedDate)
 
-    if(profileDisplayDate) profileDisplayDate.innerHTML = `<i data-lucide="shield-check" class="w-3 h-3 mr-1"></i> Member since ${formattedDate || "October 2023"}`;
+    if (profileDisplayDate) profileDisplayDate.innerHTML = `<i data-lucide="shield-check" class="w-3 h-3 mr-1"></i> Member since ${formattedDate || "October 2023"}`;
     // if(profileDisplayDate) profileDisplayDate.innerHTML = `<i data-lucide="shield-check" class="w-3 h-3 mr-1"></i> Member since ${localConnectedUserCache.createdAt || "October 2023"}`;
     // if(profileDisplayDate) profileDisplayDate.textContent = localConnectedUserCache.createdAt || "Member since October 2023";
 
     if (usernameInput) {
-        usernameInput.value = localConnectedUserCache.username || "";
+        const username = localConnectedUserCache.fullName?.trim() || "test";
+        usernameInput.value = `${username}_chat`;
+
         // Laisse le champ activé par défaut pour l'édition directe
-        usernameInput.removeAttribute('disabled');
-        usernameInput.classList.remove('bg-base-200', 'cursor-not-allowed', 'text-base-content/40');
+        // usernameInput.removeAttribute('disabled');
+        // usernameInput.classList.remove('bg-base-200', 'cursor-not-allowed', 'text-base-content/40');
     }
 }
 
@@ -741,7 +877,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Polling toutes les 4 secondes pour rafraîchir la discussion active
-    setInterval(() => {
-        if (currentConversationId) fetchMessages();
-    }, 4000);
+    // setInterval(() => {
+    //     if (currentConversationId) fetchMessages();
+    // }, 4000);
 });
