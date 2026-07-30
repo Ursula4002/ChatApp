@@ -1,6 +1,7 @@
 import { config } from './config.js';
 
 // ==================== CONFIGURATION GLOBALE ====================
+// localStorage.clear();
 
 const API_BASE_URL = config.API_BASE_URL;
 const API_KEY = config.API_KEY;
@@ -89,10 +90,12 @@ function showUsersLoader() {
 function setupUserFilter() {
     const searchInput = document.getElementById('search-input');
     const container = document.getElementById('userProfile-container');
+    const emptyMessage = document.getElementById('search-empty-message');
+
     if (!searchInput || !container) return;
 
     // On crée ou récupère un élément pour le message d'erreur
-    let emptyMessage = document.getElementById('search-empty-message');
+    // let emptyMessage = document.getElementById('search-empty-message');
     if (!emptyMessage) {
         emptyMessage = document.createElement('div');
         emptyMessage.id = 'search-empty-message';
@@ -194,6 +197,20 @@ function formatLastMessageDate(dateString) {
     }
 }
 
+// ==================== FONCTIONALITES A VENIR ====================
+
+function setupFutureFeatures() {
+    const futureFeatureButtons = document.querySelectorAll('.upcoming-feature');
+    futureFeatureButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // alert('Cette fonctionnalité est à venir !');
+            // toast("Cette fonctionnalité est à venir !", "info");
+            showToast("Cette fonctionnalité est à venir !", "info");
+        });
+    });
+}
+
 // ==================== LOGIQUE NAVIGATION & RESPONSIVE ====================
 
 function switchView(viewName) {
@@ -283,6 +300,8 @@ async function fetchConnectedUser() {
         localStorage.setItem("chat_user_id", connectedUser.id);
         displayConnectedUser(connectedUser);
     }
+    console.log(localConnectedUserCache);
+
 }
 
 async function displayConnectedUser(connectedUser) {
@@ -435,7 +454,7 @@ async function fetchMessages() {
 
     const messages = result.data?.messages || result.data || [];
     console.log(messages);
-    
+
 
     if (messages.length === 0) {
         messagesContainer.innerHTML = `
@@ -453,11 +472,11 @@ async function fetchMessages() {
 
     messagesContainer.innerHTML = '';
 
-    
+
     messages.forEach(msg => {
         const msgId = msg.id || msg._id;
         console.log(msgId);
-        
+
         const isMe = msg.senderId === localStorage.getItem("chat_user_id");
         const formattedTime = formatMessageTime(msg.createdAt || msg.updatedAt);
 
@@ -668,12 +687,34 @@ async function executeDeleteMessage(messageId) {
 const CLOUDINARY_URL = config.CLOUDINARY_URL;
 const CLOUDINARY_PRESET = config.CLOUDINARY_PRESET;
 
+// function showToast(message, type = "success") {
+//     const container = document.getElementById('toast-container');
+//     if (!container) return;
+
+//     const toast = document.createElement('div');
+//     toast.className = `alert ${type === 'success' ? 'alert-success text-white' : 'alert-error text-white'} shadow-lg rounded-xl text-xs py-2 px-4 transition-all duration-300`;
+//     toast.innerHTML = `<span>${message}</span>`;
+
+//     container.appendChild(toast);
+//     setTimeout(() => { toast.remove(); }, 3000);
+// }
+
 function showToast(message, type = "success") {
     const container = document.getElementById('toast-container');
     if (!container) return;
 
+    // Association des types avec les classes DaisyUI
+    const alertClasses = {
+        success: 'alert-success text-white',
+        error: 'alert-error text-white',
+        info: 'alert-info text-white',
+        warning: 'alert-warning text-white'
+    };
+
     const toast = document.createElement('div');
-    toast.className = `alert ${type === 'success' ? 'alert-success text-white' : 'alert-error text-white'} shadow-lg rounded-xl text-xs py-2 px-4 transition-all duration-300`;
+    const badgeClass = alertClasses[type] || alertClasses.success;
+
+    toast.className = `alert ${badgeClass} shadow-lg rounded-xl text-xs py-2 px-4 transition-all duration-300`;
     toast.innerHTML = `<span>${message}</span>`;
 
     container.appendChild(toast);

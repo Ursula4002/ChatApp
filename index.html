@@ -23,13 +23,13 @@
             <button class="btn btn-ghost btn-square text-primary rounded-xl">
                 <i data-lucide="message-square-text" class="w-5 h-5"></i>
             </button>
-            <button class="btn btn-ghost btn-square text-base-content/60 hover:text-base-content">
+            <button id="" class="btn btn-ghost btn-square text-base-content/60 hover:text-base-content upcoming-feature">
                 <i data-lucide="phone" class="w-5 h-5"></i>
             </button>
-            <button class="btn btn-ghost btn-square text-base-content/60 hover:text-base-content">
+            <button class="btn btn-ghost btn-square text-base-content/60 hover:text-base-content upcoming-feature">
                 <i data-lucide="user" class="w-5 h-5"></i>
             </button>
-            <button class="btn btn-ghost btn-square text-base-content/60 hover:text-base-content">
+            <button class="btn btn-ghost btn-square text-base-content/60 hover:text-base-content upcoming-feature">
                 <i data-lucide="folder-kanban" class="w-5 h-5"></i>
             </button>
         </div>
@@ -58,7 +58,11 @@
         <!-- users profiles -->
         <div class="flex-1 overflow-y-auto px-2 space-y-1 pb-24 md:pb-4" id="userProfile-container">
             <!-- Liste des conversations  -->
-            <div id="search-empty-message"></div>
+            <div id="search-empty-message" class="text-center text-xs text-base-content/40 p-6 hidden">
+                Aucun utilisateur trouvé
+            </div>
+
+
             <!-- Conversation1 -->
             <!-- <div
                 class="flex items-center gap-3 p-3 rounded-xl bg-base-200/70 cursor-pointer border border-base-content/10">
@@ -140,9 +144,9 @@
                 <div class="flex items-center gap-3" id="active-user-info"></div>
             </div>
             <div class="flex items-center gap-1">
-                <button class="btn btn-ghost btn-sm btn-square text-base-content/70"><i data-lucide="video"
+                <button class="btn btn-ghost btn-sm btn-square text-base-content/70 upcoming-feature"><i data-lucide="video"
                         class="w-4 h-4"></i></button>
-                <button class="btn btn-ghost btn-sm btn-square text-base-content/70"><i data-lucide="phone"
+                <button class="btn btn-ghost btn-sm btn-square text-base-content/70 upcoming-feature"><i data-lucide="phone"
                         class="w-4 h-4"></i></button>
                 <button class="btn btn-ghost btn-sm btn-square text-base-content/70">
                     <i data-lucide="ellipsis-vertical" class="w-4 h-4"></i>
@@ -167,7 +171,7 @@
             <button class="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-base-content">
                 <i data-lucide="plus" class="w-5 h-5"></i>
             </button>
-            <button class="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-base-content mr-1">
+            <button class="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-base-content mr-1 upcoming-feature">
                 <i data-lucide="smile" class="w-5 h-5"></i>
             </button>
             <div class="flex-1 relative">
@@ -264,8 +268,7 @@
                                 class="text-[10px] font-bold text-base-content/40 uppercase tracking-wider block mb-1">Username</label>
                             <input type="text" value="arivera_chat"
                                 class="input input-sm input-bordered pointer-events-none w-full rounded-md bg-base-200 text-base-content/40 text-sm focus:outline-none cursor-not-allowed"
-                                id="username-input" 
-                                disabled />
+                                id="username-input" disabled />
                         </div>
 
                         <div class="grid grid-cols-2 gap-2">
