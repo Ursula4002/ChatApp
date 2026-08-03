@@ -199,16 +199,57 @@ function formatLastMessageDate(dateString) {
 
 // ==================== FONCTIONALITES A VENIR ====================
 
+// alert('Cette fonctionnalité est à venir !');
+// toast("Cette fonctionnalité est à venir !", "info");
+
+// function setupFutureFeatures() {
+//     const futureFeatureButtons = document.querySelectorAll('.upcoming-feature');
+//     futureFeatureButtons.forEach(btn => {
+//         btn.addEventListener('click', (e) => {
+//             e.preventDefault();
+
+//             console.log("button clicked");
+//             showToast("Cette fonctionnalité est à venir !", "info");
+
+//         });
+//     });
+// }
+
+// tippy('.upcoming-feature', {
+//     content: '<span class="text-xs font-semibold px-2 py-1 bg-neutral text-neutral-content rounded-lg shadow-md">Bientôt disponible !</span>',
+//     allowHTML: true,
+//     trigger: 'click',
+//     placement: 'top',
+//     onShow(instance) {
+//         setTimeout(() => instance.hide(), 2000);
+//     }
+// });
+
 function setupFutureFeatures() {
-    const futureFeatureButtons = document.querySelectorAll('.upcoming-feature');
-    futureFeatureButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            // alert('Cette fonctionnalité est à venir !');
-            // toast("Cette fonctionnalité est à venir !", "info");
-            showToast("Cette fonctionnalité est à venir !", "info");
+    if (typeof tippy !== 'undefined') {
+        const upcomingFeatureButtons = document.querySelectorAll('.upcoming-feature');
+        
+        if (upcomingFeatureButtons.length === 0) {
+            console.warn("Aucun élément avec la classe .upcoming-feature trouvé.");
+            return;
+        }
+
+        tippy(upcomingFeatureButtons, {
+            content: '<span class="alert alert-info text-xs font-semibold py-1 px-3 shadow-md rounded-lg inline-block">Bientôt disponible !</span>',
+            allowHTML: true,
+            trigger: 'click',
+            placement: 'top',
+            animation: 'fade',
+            duration: [200, 150],
+            onShow(instance) {
+                setTimeout(() => {
+                    instance.hide();
+                }, 2000);
+            }
         });
-    });
+    } else {
+        console.warn("Tippy.js n'est pas disponible.");
+    }
 }
 
 // ==================== LOGIQUE NAVIGATION & RESPONSIVE ====================
@@ -901,6 +942,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupResponsiveLogic();
     setupProfileLogic();
     setupMessageSending();
+
+    setupFutureFeatures()
 
     // 1. Affichage immédiat d'un loader dans la liste de gauche pour l'UX
     showUsersLoader();

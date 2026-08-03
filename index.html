@@ -5,10 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interface de Messagerie</title>
+    
     <!-- Import de daisyui, tailwindcss et lucide -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tippy.js (CSS + JS) -->
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
 </head>
 
 <body
@@ -23,7 +29,8 @@
             <button class="btn btn-ghost btn-square text-primary rounded-xl">
                 <i data-lucide="message-square-text" class="w-5 h-5"></i>
             </button>
-            <button id="" class="btn btn-ghost btn-square text-base-content/60 hover:text-base-content upcoming-feature">
+            <button id=""
+                class="btn btn-ghost btn-square text-base-content/60 hover:text-base-content upcoming-feature">
                 <i data-lucide="phone" class="w-5 h-5"></i>
             </button>
             <button class="btn btn-ghost btn-square text-base-content/60 hover:text-base-content upcoming-feature">
@@ -144,11 +151,11 @@
                 <div class="flex items-center gap-3" id="active-user-info"></div>
             </div>
             <div class="flex items-center gap-1">
-                <button class="btn btn-ghost btn-sm btn-square text-base-content/70 upcoming-feature"><i data-lucide="video"
-                        class="w-4 h-4"></i></button>
-                <button class="btn btn-ghost btn-sm btn-square text-base-content/70 upcoming-feature"><i data-lucide="phone"
-                        class="w-4 h-4"></i></button>
-                <button class="btn btn-ghost btn-sm btn-square text-base-content/70">
+                <button class="btn btn-ghost btn-sm btn-square text-base-content/70 upcoming-feature"><i
+                        data-lucide="video" class="w-4 h-4"></i></button>
+                <button class="btn btn-ghost btn-sm btn-square text-base-content/70 upcoming-feature"><i
+                        data-lucide="phone" class="w-4 h-4"></i></button>
+                <button class="btn btn-ghost btn-sm btn-square text-base-content/70 upcoming-feature">
                     <i data-lucide="ellipsis-vertical" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -168,10 +175,11 @@
         </div>
         <!-- Icônes du bas et zone de saisi -->
         <footer class="p-4 border-t border-base-200 flex items-center gap-2 flex-shrink-0 hidden" id="chat-footer">
-            <button class="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-base-content">
+            <button class="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-base-content upcoming-feature">
                 <i data-lucide="plus" class="w-5 h-5"></i>
             </button>
-            <button class="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-base-content mr-1 upcoming-feature">
+            <button
+                class="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-base-content mr-1 smile upcoming-feature">
                 <i data-lucide="smile" class="w-5 h-5"></i>
             </button>
             <div class="flex-1 relative">

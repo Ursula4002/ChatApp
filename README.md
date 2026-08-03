@@ -11,6 +11,7 @@ L'application permet aux utilisateurs de créer un profil sécurisé, de se conn
 * **Frontend :** HTML5, JavaScript (ES6+ Modules)
 * **Styling & Icons :** Tailwind CSS, daisyUI, Lucide Icons
 * **Validation des données :** Yup
+* **UI Utilities :** [Tippy.js](https://atomiks.github.io/tippyjs/) (Tooltips pour les fonctionnalités à venir)
 * **Vérification d'email :** AbstractAPI (Email Reputation)
 * **Backend / API :** Kadea Chat API (REST)
 
