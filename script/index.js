@@ -228,7 +228,7 @@ function formatLastMessageDate(dateString) {
 function setupFutureFeatures() {
     if (typeof tippy !== 'undefined') {
         const upcomingFeatureButtons = document.querySelectorAll('.upcoming-feature');
-        
+
         if (upcomingFeatureButtons.length === 0) {
             console.warn("Aucun élément avec la classe .upcoming-feature trouvé.");
             return;
@@ -889,6 +889,317 @@ function setupProfileLogic() {
         });
     }
     // =====================================================================
+
+    // ==================== MODIFIER LE MOT DE PASSE ====================
+
+//     function togglePasswordForm() {
+//         const container = document.getElementById('password-form-container');
+//         if (!container) return;
+
+//         // Si le formulaire est déjà visible, on le ferme
+//         if (!container.classList.contains('hidden')) {
+//             container.classList.add('hidden');
+//             container.innerHTML = '';
+//             return;
+//         }
+
+//         // Injection du formulaire sécurisé
+//         container.innerHTML = `
+//         <form id="pwd-form" class="p-4 border border-base-content/10 bg-base-200/30 rounded-2xl flex flex-col gap-3 mt-4">
+//             <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/60">Sécuriser le compte</h4>
+            
+//             <div class="form-control w-full">
+//                 <label class="label py-1"><span class="label-text text-xs">Mot de passe actuel</span></label>
+//                 <input type="password" id="old-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
+//             </div>
+
+//             <div class="form-control w-full">
+//                 <label class="label py-1"><span class="label-text text-xs">Nouveau mot de passe</span></label>
+//                 <input type="password" id="new-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
+//             </div>
+
+//             <div class="form-control w-full">
+//                 <label class="label py-1"><span class="label-text text-xs">Confirmer le nouveau mot de passe</span></label>
+//                 <input type="password" id="confirm-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
+//             </div>
+
+//             <button type="submit" id="submit-new-pwd-btn" class="btn btn-primary btn-sm text-white mt-2 w-full">
+//                 <span id="pwd-spinner" class="loading loading-spinner loading-xs hidden"></span>
+//                 Confirmer le changement
+//             </button>
+//         </form>
+//     `;
+//         container.classList.remove('hidden');
+
+//         // Écouteur sur la soumission du formulaire
+//         // document.getElementById('pwd-form').addEventListener('submit', async (e) => {
+//         //     e.preventDefault(); // Empêche le rechargement de la page
+
+//         //     const oldPassword = document.getElementById('old-password-input').value.trim();
+//         //     const newPassword = document.getElementById('new-password-input').value.trim();
+//         //     const confirmPassword = document.getElementById('confirm-password-input').value.trim();
+//         //     const spinner = document.getElementById('pwd-spinner');
+//         //     const submitBtn = document.getElementById('submit-new-pwd-btn');
+
+//         //     // 1. Validations client
+//         //     if (!oldPassword || !newPassword || !confirmPassword) {
+//         //         showToast("Veuillez remplir tous les champs de sécurité.", "error");
+//         //         return;
+//         //     }
+
+//         //     if (newPassword.length < 6) {
+//         //         showToast("Le nouveau mot de passe doit contenir au moins 6 caractères.", "error");
+//         //         return;
+//         //     }
+
+//         //     if (newPassword !== confirmPassword) {
+//         //         showToast("La confirmation ne correspond pas au nouveau mot de passe.", "error");
+//         //         return;
+//         //     }
+
+//         //     if (oldPassword === newPassword) {
+//         //         showToast("Le nouveau mot de passe doit être différent de l'actuel.", "error");
+//         //         return;
+//         //     }
+
+//         //     // Bloquer le bouton et lancer le spinner
+//         //     if (spinner) spinner.classList.remove('hidden');
+//         //     if (submitBtn) submitBtn.disabled = true;
+
+//         //     console.log("[ACTION] Envoi de la demande de modification de mot de passe...");
+
+//         //     const result = await apiRequest("/users/me", "PATCH", {
+//         //         oldPassword: oldPassword,
+//         //         password: newPassword
+//         //     });
+
+//         //     console.log("[API RESPONSE] Réponse changement mot de passe :", result);
+
+//         //     if (result && result.success) {
+//         //         showToast("Mot de passe mis à jour ! Redirection...", "success");
+
+//         //         setTimeout(() => {
+//         //             localStorage.clear();
+//         //             window.location.href = "/auth/signIn.html";
+//         //         }, 2000);
+//         //     } else {
+//         //         if (spinner) spinner.classList.add('hidden');
+//         //         if (submitBtn) submitBtn.disabled = false;
+//         //         showToast(result?.message || "Impossible de mettre à jour le mot de passe.", "error");
+//         //     }
+//         // });
+
+//         // Écouteur sur la soumission du formulaire
+// document.getElementById('pwd-form').addEventListener('submit', async (e) => {
+//     e.preventDefault();
+
+//     const oldPassword = document.getElementById('old-password-input').value.trim();
+//     const newPassword = document.getElementById('new-password-input').value.trim();
+//     const confirmPassword = document.getElementById('confirm-password-input').value.trim();
+//     const spinner = document.getElementById('pwd-spinner');
+//     const submitBtn = document.getElementById('submit-new-pwd-btn');
+
+//     // 1. Validations de surface côté client
+//     if (!oldPassword || !newPassword || !confirmPassword) {
+//         showToast("Veuillez remplir tous les champs de sécurité.", "error");
+//         return;
+//     }
+
+//     if (newPassword.length < 6) {
+//         showToast("Le nouveau mot de passe doit contenir au moins 6 caractères.", "error");
+//         return;
+//     }
+
+//     if (newPassword !== confirmPassword) {
+//         showToast("La confirmation ne correspond pas au nouveau mot de passe.", "error");
+//         return;
+//     }
+
+//     if (oldPassword === newPassword) {
+//         showToast("Le nouveau mot de passe doit être différent de l'actuel.", "error");
+//         return;
+//     }
+
+//     // Activer l'état de chargement
+//     if (spinner) spinner.classList.remove('hidden');
+//     if (submitBtn) submitBtn.disabled = true;
+
+//     try {
+//         // Récupérer l'email stocké lors de la session
+//         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+
+//         console.log("Email récupéré pour ré-authentification :", currentUser);
+        
+//         // STEP 1 : Vérifier l'ancien mot de passe via POST /auth/login
+//         console.log("[SECURITY CHECK] Vérification de l'ancien mot de passe...");
+//         const authCheck = await apiRequest("/auth/login", "POST", {
+//             email: currentUser.email,
+//             password: oldPassword
+//         });
+
+//         if (!authCheck || !authCheck.success) {
+//             showToast("L'ancien mot de passe est incorrect.", "error");
+//             if (spinner) spinner.classList.add('hidden');
+//             if (submitBtn) submitBtn.disabled = false;
+//             return;
+//         }
+
+//         // STEP 2 : Si l'ancien mot de passe est valide, on met à jour avec PATCH /users/me
+//         console.log("[ACTION] Mise à jour du nouveau mot de passe...");
+//         const updateResult = await apiRequest("/users/me", "PATCH", {
+//             password: newPassword
+//         });
+
+//         if (updateResult && updateResult.success) {
+//             showToast("Mot de passe mis à jour ! Redirection vers la connexion...", "success");
+
+//             setTimeout(() => {
+//                 localStorage.clear();
+//                 window.location.href = "/auth/signIn.html";
+//             }, 2000);
+//         } else {
+//             showToast(updateResult?.message || "Erreur lors de la mise à jour.", "error");
+//             if (spinner) spinner.classList.add('hidden');
+//             if (submitBtn) submitBtn.disabled = false;
+//         }
+
+//     } catch (err) {
+//         console.error(err);
+//         showToast("Une erreur est survenue lors de la vérification.", "error");
+//         if (spinner) spinner.classList.add('hidden');
+//         if (submitBtn) submitBtn.disabled = false;
+//     }
+// });
+//     }
+
+function togglePasswordForm() {
+    const container = document.getElementById('password-form-container');
+    if (!container) return;
+
+    // Si le formulaire est déjà visible, on le ferme au clic suivant
+    if (!container.classList.contains('hidden')) {
+        container.classList.add('hidden');
+        container.innerHTML = '';
+        return;
+    }
+
+    // On vérifie qu'on a bien l'utilisateur connecté en cache
+    if (!localConnectedUserCache || !localConnectedUserCache.email) {
+        showToast("Impossible de récupérer l'email de l'utilisateur connecté.", "error");
+        return;
+    }
+
+    // Injection du formulaire DaisyUI
+    container.innerHTML = `
+        <form id="pwd-form" class="p-4 border border-base-content/10 bg-base-200/30 rounded-2xl flex flex-col gap-3 mt-4">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/60">Sécuriser le compte</h4>
+            
+            <div class="form-control w-full">
+                <label class="label py-1"><span class="label-text text-xs">Mot de passe actuel</span></label>
+                <input type="password" id="old-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label py-1"><span class="label-text text-xs">Nouveau mot de passe</span></label>
+                <input type="password" id="new-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label py-1"><span class="label-text text-xs">Confirmer le nouveau mot de passe</span></label>
+                <input type="password" id="confirm-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" id="submit-new-pwd-btn" class="btn btn-primary btn-sm text-white mt-2 w-full">
+                <span id="pwd-spinner" class="loading loading-spinner loading-xs hidden"></span>
+                Confirmer le changement
+            </button>
+        </form>
+    `;
+    container.classList.remove('hidden');
+
+    // Écouteur sur la soumission
+    document.getElementById('pwd-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const oldPassword = document.getElementById('old-password-input').value.trim();
+        const newPassword = document.getElementById('new-password-input').value.trim();
+        const confirmPassword = document.getElementById('confirm-password-input').value.trim();
+        const spinner = document.getElementById('pwd-spinner');
+        const submitBtn = document.getElementById('submit-new-pwd-btn');
+
+        // 1. Validations côté client
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            showToast("Veuillez remplir tous les champs.", "error");
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            showToast("Le nouveau mot de passe doit contenir au moins 6 caractères.", "error");
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showToast("La confirmation ne correspond pas au nouveau mot de passe.", "error");
+            return;
+        }
+
+        if (oldPassword === newPassword) {
+            showToast("Le nouveau mot de passe doit être différent de l'actuel.", "error");
+            return;
+        }
+
+        // Activation visuelle du loader
+        if (spinner) spinner.classList.remove('hidden');
+        if (submitBtn) submitBtn.disabled = true;
+
+        try {
+            // STEP 1 : On récupère l'email directement depuis localConnectedUserCache
+            const userEmail = localConnectedUserCache.email;
+            console.log("[SECURITY CHECK] Vérification du mot de passe pour :", userEmail);
+
+            // STEP 2 : Vérification de l'ancien mot de passe via POST /auth/login
+            const authCheck = await apiRequest("/auth/login", "POST", {
+                email: userEmail,
+                password: oldPassword
+            });
+
+            // Si la vérification échoue
+            if (!authCheck || authCheck.success === false || authCheck.status >= 400) {
+                showToast("L'ancien mot de passe est incorrect.", "error");
+                return;
+            }
+
+            // STEP 3 : Mise à jour avec le nouveau mot de passe via PATCH /users/me
+            console.log("[ACTION] Envoi du nouveau mot de passe...");
+            const updateResult = await apiRequest("/users/me", "PATCH", {
+                password: newPassword
+            });
+
+            if (updateResult && (updateResult.success || updateResult.id)) {
+                showToast("Mot de passe mis à jour ! Redirection vers la connexion...", "success");
+
+                setTimeout(() => {
+                    localStorage.clear();
+                    window.location.href = "auth/signIn.html";
+                }, 2000);
+            } else {
+                showToast(updateResult.message || "Erreur lors de la mise à jour.", "error");
+            }
+
+        } catch (err) {
+            console.error(err);
+            showToast("Une erreur est survenue lors du traitement.", "error");
+        } finally {
+            if (spinner) spinner.classList.add('hidden');
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    });
+}
+
+    const changePasswordBtn = document.getElementById('change-password-btn');
+    if (changePasswordBtn) {
+        changePasswordBtn.addEventListener('click', togglePasswordForm);
+    }
 
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {

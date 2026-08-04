@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interface de Messagerie</title>
-    
+
     <!-- Import de daisyui, tailwindcss et lucide -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -175,7 +175,8 @@
         </div>
         <!-- Icônes du bas et zone de saisi -->
         <footer class="p-4 border-t border-base-200 flex items-center gap-2 flex-shrink-0 hidden" id="chat-footer">
-            <button class="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-base-content upcoming-feature">
+            <button
+                class="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-base-content upcoming-feature">
                 <i data-lucide="plus" class="w-5 h-5"></i>
             </button>
             <button
@@ -300,34 +301,34 @@
                         <div
                             class="card bg-base-100 border border-base-300 p-5 rounded-xl shadow-sm space-y-3 text-left mt-4">
                             <div class="flex items-center justify-between text-base-content/70">
-                                <h3 class="font-bold text-xs tracking-wider uppercase opacity-80">Apparence & Thème</h3>
+                                <h3 class="font-bold text-xs tracking-wider uppercase opacity-80">Appearance & Theme</h3>
                                 <i data-lucide="palette" class="w-4 h-4 opacity-60"></i>
                             </div>
 
                             <!-- Boutton light/dark -->
                             <div>
                                 <label
-                                    class="text-[10px] font-bold text-base-content/50 uppercase tracking-wider block mb-2">Choisir
-                                    un mode</label>
+                                    class="text-[10px] font-bold text-base-content/50 uppercase tracking-wider block mb-2">Choose
+                                    a mode</label>
                                 <div class="grid grid-cols-2 gap-2">
                                     <!-- Bouton Mode Clair -->
                                     <button id="theme-light-btn"
                                         class="btn btn-sm btn-outline gap-2 justify-start font-medium text-xs rounded-md">
                                         <i data-lucide="sun" class="w-3.5 h-3.5"></i>
-                                        Clair
+                                        Light
                                     </button>
                                     <!-- Bouton Mode Sombre -->
                                     <button id="theme-dark-btn"
                                         class="btn btn-sm btn-outline gap-2 justify-start font-medium text-xs rounded-md">
                                         <i data-lucide="moon" class="w-3.5 h-3.5"></i>
-                                        Sombre
+                                        Dark
                                     </button>
                                 </div>
                             </div>
 
                             <!-- Gestion automatique -->
                             <div class="flex items-center justify-between pt-1 border-t border-base-200">
-                                <span class="text-xs text-base-content/70">Mode automatique (Heure)</span>
+                                <span class="text-xs text-base-content/70">Auto mode (Time)</span>
                                 <input type="checkbox" id="theme-auto-toggle" class="toggle toggle-primary toggle-sm"
                                     checked />
                             </div>
@@ -374,10 +375,16 @@
                             Profile</span>
                         <span id="save-btn-spinner" class="loading loading-spinner loading-xs hidden"></span>
                     </button>
-                    <button
+
+                    <button id="change-password-btn"
                         class="btn bg-base-300 border-none hover:bg-base-content/20 w-full rounded-xl text-base-content font-medium">
                         <i data-lucide="key-round" class="w-4 h-4 inline mr-1"></i> Change Password
                     </button>
+
+                    <!-- Le conteneur vide qui va recevoir le formulaire dynamiquement -->
+                    <div id="password-form-container" class="hidden w-full"></div>
+
+
                     <button id="logout-btn"
                         class="btn btn-ghost text-error hover:bg-error/10 w-full rounded-xl font-medium">
                         <i data-lucide="log-out" class="w-4 h-4 inline mr-1"></i> Logout
