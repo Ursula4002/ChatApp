@@ -775,28 +775,19 @@ function populateProfileForm() {
         profileAvatar.src = localConnectedUserCache.avatarUrl || "https://www.image2url.com/r2/default/images/1783930708557-65ccc78d-7a35-48f7-a316-405f58041f34.jpg";
     }
 
+    // Affichage propre du nom et du champ input
     if (displayName) displayName.textContent = localConnectedUserCache.fullName || "Utilisateur";
+    if (usernameInput) usernameInput.value = localConnectedUserCache.fullName || "";
+
     if (displayEmail) displayEmail.textContent = localConnectedUserCache.email || "non-communique@kadea.co";
 
-    // const createdAtDate = localConnectedUserCache.createdAt ? new Date(localConnectedUserCache.createdAt) : null;
     const createdAtDate = localConnectedUserCache.createdAt ? new Date(localConnectedUserCache.createdAt) : null;
     const options = { year: 'numeric', month: 'long' };
-    const formattedDate = createdAtDate ? createdAtDate.toLocaleDateString('en-US', options) : "";
-    // const formattedDate = createdAtDate ? createdAtDate.toLocaleDateString('fr-FR', options) : "October 2023";
+    const formattedDate = createdAtDate ? createdAtDate.toLocaleDateString('fr-FR', options) : "";
 
-    console.log(formattedDate)
-
-    if (profileDisplayDate) profileDisplayDate.innerHTML = `<i data-lucide="shield-check" class="w-3 h-3 mr-1"></i> Member since ${formattedDate || "October 2023"}`;
-    // if(profileDisplayDate) profileDisplayDate.innerHTML = `<i data-lucide="shield-check" class="w-3 h-3 mr-1"></i> Member since ${localConnectedUserCache.createdAt || "October 2023"}`;
-    // if(profileDisplayDate) profileDisplayDate.textContent = localConnectedUserCache.createdAt || "Member since October 2023";
-
-    if (usernameInput) {
-        const username = localConnectedUserCache.fullName?.trim() || "test";
-        usernameInput.value = `${username}_chat`;
-
-        // Laisse le champ activé par défaut pour l'édition directe
-        // usernameInput.removeAttribute('disabled');
-        // usernameInput.classList.remove('bg-base-200', 'cursor-not-allowed', 'text-base-content/40');
+    if (profileDisplayDate) {
+        profileDisplayDate.innerHTML = `<i data-lucide="shield-check" class="w-3 h-3 mr-1"></i> Membre depuis ${formattedDate || "Octobre 2023"}`;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 }
 
@@ -810,14 +801,157 @@ async function uploadImageToCloudinary(file) {
         if (!response.ok) throw new Error("Échec Cloudinary");
 
         const data = await response.json();
-        console.log("----------------------: ", data);
-        return data.secure_url;
+        console.log("-------------------Cloudinary-----------------");
 
+        console.log(data, "URL de l'image :", data.secure_url);
+
+        return data.secure_url;
     } catch (error) {
         console.error("[CLOUDINARY] Erreur :", error);
         showToast("Impossible d'envoyer l'image.", "error");
         return null;
     }
+}
+
+async function saveProfileData(fieldsToUpdate) {
+    const btnText = document.getElementById('save-btn-text');
+    const btnSpinner = document.getElementById('save-btn-spinner');
+
+    if (btnText && btnSpinner) {
+        btnText.classList.add('hidden');
+        btnSpinner.classList.remove('hidden');
+    }
+
+    const result = await apiRequest("/users/me", "PATCH", fieldsToUpdate);
+
+    if (btnText && btnSpinner) {
+        btnText.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
+    }
+
+    if (result && (result.success || result.id || result._id || result.email)) {
+        showToast("Profil mis à jour avec succès !");
+        localConnectedUserCache = null;
+        await fetchConnectedUser();
+    } else {
+        showToast(result?.message || "Erreur lors de la sauvegarde.", "error");
+    }
+}
+
+function togglePasswordForm() {
+    const container = document.getElementById('password-form-container');
+    if (!container) return;
+
+    if (!container.classList.contains('hidden')) {
+        container.classList.add('hidden');
+        container.innerHTML = '';
+        return;
+    }
+
+    if (!localConnectedUserCache || !localConnectedUserCache.email) {
+        showToast("Impossible de récupérer l'email de l'utilisateur connecté.", "error");
+        return;
+    }
+
+    container.innerHTML = `
+        <form id="pwd-form" class="p-4 border border-base-content/10 bg-base-200/30 rounded-2xl flex flex-col gap-3 mt-4">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/60">Sécuriser le compte</h4>
+            
+            <div class="form-control w-full">
+                <label class="label py-1"><span class="label-text text-xs">Mot de passe actuel</span></label>
+                <input type="password" id="old-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label py-1"><span class="label-text text-xs">Nouveau mot de passe</span></label>
+                <input type="password" id="new-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
+            </div>
+
+            <div class="form-control w-full">
+                <label class="label py-1"><span class="label-text text-xs">Confirmer le nouveau mot de passe</span></label>
+                <input type="password" id="confirm-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" id="submit-new-pwd-btn" class="btn btn-primary btn-sm text-white mt-2 w-full">
+                <span id="pwd-spinner" class="loading loading-spinner loading-xs hidden"></span>
+                Confirmer le changement
+            </button>
+        </form>
+    `;
+    container.classList.remove('hidden');
+
+    const form = document.getElementById('pwd-form');
+
+    // Clonage pour réinitialiser les listeners et éviter les soumissions multiples
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+
+    newForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const oldPassword = document.getElementById('old-password-input').value.trim();
+        const newPassword = document.getElementById('new-password-input').value.trim();
+        const confirmPassword = document.getElementById('confirm-password-input').value.trim();
+        const spinner = document.getElementById('pwd-spinner');
+        const submitBtn = document.getElementById('submit-new-pwd-btn');
+
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            showToast("Veuillez remplir tous les champs.", "error");
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            showToast("Le nouveau mot de passe doit contenir au moins 6 caractères.", "error");
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showToast("La confirmation ne correspond pas au nouveau mot de passe.", "error");
+            return;
+        }
+
+        if (oldPassword === newPassword) {
+            showToast("Le nouveau mot de passe doit être différent de l'actuel.", "error");
+            return;
+        }
+
+        if (spinner) spinner.classList.remove('hidden');
+        if (submitBtn) submitBtn.disabled = true;
+
+        try {
+            const userEmail = localConnectedUserCache.email;
+
+            const authCheck = await apiRequest("/auth/login", "POST", {
+                email: userEmail,
+                password: oldPassword
+            });
+
+            if (!authCheck || authCheck.success === false || authCheck.status >= 400) {
+                showToast("L'ancien mot de passe est incorrect.", "error");
+                return;
+            }
+
+            const updateResult = await apiRequest("/users/me", "PATCH", { password: newPassword });
+
+            if (updateResult && (updateResult.success || updateResult.id)) {
+                showToast("Mot de passe mis à jour ! Redirection...", "success");
+
+                setTimeout(() => {
+                    localStorage.clear();
+                    window.location.href = "auth/signIn.html";
+                }, 2000);
+            } else {
+                showToast(updateResult.message || "Erreur lors de la mise à jour.", "error");
+            }
+
+        } catch (err) {
+            console.error(err);
+            showToast("Une erreur est survenue.", "error");
+        } finally {
+            if (spinner) spinner.classList.add('hidden');
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    });
 }
 
 function setupProfileLogic() {
@@ -826,6 +960,8 @@ function setupProfileLogic() {
     const saveProfileBtn = document.getElementById('profile-save-btn');
     const avatarFileInput = document.getElementById('avatar-file-input');
     const chatTabBtn = document.querySelector('aside button:nth-child(2)');
+    const changePasswordBtn = document.getElementById('change-password-btn');
+    const logoutBtn = document.getElementById('logout-btn');
 
     if (settingsBtn) settingsBtn.addEventListener('click', () => switchView('profile'));
     if (chatTabBtn) chatTabBtn.addEventListener('click', () => switchView('chat'));
@@ -834,31 +970,91 @@ function setupProfileLogic() {
         connectedContainer.addEventListener('click', () => switchView('profile'));
     }
 
+    // if (avatarFileInput) {
+    //     avatarFileInput.addEventListener('change', async (e) => {
+    //         const file = e.target.files[0];
+    //         if (!file) return;
+
+    //         const remoteUrl = await uploadImageToCloudinary(file);
+    //         if (remoteUrl) {
+    //             await saveProfileData({
+    //                 avatarUrl: remoteUrl,
+    //                 fullName: localConnectedUserCache?.fullName || undefined
+    //             });
+    //         }
+    //     });
+    // }
+
     if (avatarFileInput) {
         avatarFileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
+            // 1. Notification du début de chargement
+            showToast("Chargement de la photo en cours...", "info");
+
+            // 2. Upload vers Cloudinary
             const remoteUrl = await uploadImageToCloudinary(file);
+
             if (remoteUrl) {
-                await saveProfileData({ avatarUrl: remoteUrl });
+                // 3. Mise à jour immédiate de la balise <img> dans l'interface
+                const profileAvatar = document.getElementById('profile-avatar');
+                if (profileAvatar) {
+                    profileAvatar.src = remoteUrl;
+                }
+
+                // 4. Sauvegarde en BDD
+                await saveProfileData({
+                    avatarUrl: remoteUrl,
+                    fullName: localConnectedUserCache?.fullName || undefined
+                });
             }
         });
     }
+
+    // if (saveProfileBtn) {
+    //     saveProfileBtn.addEventListener('click', async () => {
+    //         const username = document.getElementById('username-input').value.trim();
+    //         if (!username) {
+    //             showToast("Le nom d'utilisateur ne peut pas être vide.", "error");
+    //             return;
+    //         }
+    //         await saveProfileData({ fullName: username });
+    //     });
+    // }
+
+    // if (saveProfileBtn) {
+    //     saveProfileBtn.addEventListener('click', async () => {
+    //         const username = document.getElementById('username-input').value.trim();
+
+    //         if (!username) {
+    //             showToast("Le nom d'utilisateur ne peut pas être vide.", "error");
+    //             return;
+    //         }
+
+    //         // On nettoie au cas où l'utilisateur aurait écrit _chat plusieurs fois à la main
+    //         const cleanUsername = username.replace(/(_chat)+$/g, '');
+    //         const finalUsername = `${cleanUsername}_chat`;
+
+    //         await saveProfileData({ fullName: finalUsername });
+    //     });
+    // }
 
     if (saveProfileBtn) {
         saveProfileBtn.addEventListener('click', async () => {
             const username = document.getElementById('username-input').value.trim();
+
             if (!username) {
                 showToast("Le nom d'utilisateur ne peut pas être vide.", "error");
                 return;
             }
-            await saveProfileData({ username });
+
+            await saveProfileData({ fullName: username });
         });
     }
 
-    // ==================== CODE AJOUTÉ POUR LA LIGHTBOX ====================
-    const avatarContainer = document.querySelector('.group.cursor-pointer'); // Cible le conteneur HTML de ton avatar
+    // Gestion Lightbox Avatar
+    const avatarContainer = document.querySelector('.group.cursor-pointer');
     const imageLightbox = document.getElementById('image-lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
     const closeLightboxBtn = document.getElementById('close-lightbox-btn');
@@ -888,365 +1084,77 @@ function setupProfileLogic() {
             if (e.target === imageLightbox) closeLightbox();
         });
     }
-    // =====================================================================
 
-    // ==================== MODIFIER LE MOT DE PASSE ====================
-
-//     function togglePasswordForm() {
-//         const container = document.getElementById('password-form-container');
-//         if (!container) return;
-
-//         // Si le formulaire est déjà visible, on le ferme
-//         if (!container.classList.contains('hidden')) {
-//             container.classList.add('hidden');
-//             container.innerHTML = '';
-//             return;
-//         }
-
-//         // Injection du formulaire sécurisé
-//         container.innerHTML = `
-//         <form id="pwd-form" class="p-4 border border-base-content/10 bg-base-200/30 rounded-2xl flex flex-col gap-3 mt-4">
-//             <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/60">Sécuriser le compte</h4>
-            
-//             <div class="form-control w-full">
-//                 <label class="label py-1"><span class="label-text text-xs">Mot de passe actuel</span></label>
-//                 <input type="password" id="old-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
-//             </div>
-
-//             <div class="form-control w-full">
-//                 <label class="label py-1"><span class="label-text text-xs">Nouveau mot de passe</span></label>
-//                 <input type="password" id="new-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
-//             </div>
-
-//             <div class="form-control w-full">
-//                 <label class="label py-1"><span class="label-text text-xs">Confirmer le nouveau mot de passe</span></label>
-//                 <input type="password" id="confirm-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
-//             </div>
-
-//             <button type="submit" id="submit-new-pwd-btn" class="btn btn-primary btn-sm text-white mt-2 w-full">
-//                 <span id="pwd-spinner" class="loading loading-spinner loading-xs hidden"></span>
-//                 Confirmer le changement
-//             </button>
-//         </form>
-//     `;
-//         container.classList.remove('hidden');
-
-//         // Écouteur sur la soumission du formulaire
-//         // document.getElementById('pwd-form').addEventListener('submit', async (e) => {
-//         //     e.preventDefault(); // Empêche le rechargement de la page
-
-//         //     const oldPassword = document.getElementById('old-password-input').value.trim();
-//         //     const newPassword = document.getElementById('new-password-input').value.trim();
-//         //     const confirmPassword = document.getElementById('confirm-password-input').value.trim();
-//         //     const spinner = document.getElementById('pwd-spinner');
-//         //     const submitBtn = document.getElementById('submit-new-pwd-btn');
-
-//         //     // 1. Validations client
-//         //     if (!oldPassword || !newPassword || !confirmPassword) {
-//         //         showToast("Veuillez remplir tous les champs de sécurité.", "error");
-//         //         return;
-//         //     }
-
-//         //     if (newPassword.length < 6) {
-//         //         showToast("Le nouveau mot de passe doit contenir au moins 6 caractères.", "error");
-//         //         return;
-//         //     }
-
-//         //     if (newPassword !== confirmPassword) {
-//         //         showToast("La confirmation ne correspond pas au nouveau mot de passe.", "error");
-//         //         return;
-//         //     }
-
-//         //     if (oldPassword === newPassword) {
-//         //         showToast("Le nouveau mot de passe doit être différent de l'actuel.", "error");
-//         //         return;
-//         //     }
-
-//         //     // Bloquer le bouton et lancer le spinner
-//         //     if (spinner) spinner.classList.remove('hidden');
-//         //     if (submitBtn) submitBtn.disabled = true;
-
-//         //     console.log("[ACTION] Envoi de la demande de modification de mot de passe...");
-
-//         //     const result = await apiRequest("/users/me", "PATCH", {
-//         //         oldPassword: oldPassword,
-//         //         password: newPassword
-//         //     });
-
-//         //     console.log("[API RESPONSE] Réponse changement mot de passe :", result);
-
-//         //     if (result && result.success) {
-//         //         showToast("Mot de passe mis à jour ! Redirection...", "success");
-
-//         //         setTimeout(() => {
-//         //             localStorage.clear();
-//         //             window.location.href = "/auth/signIn.html";
-//         //         }, 2000);
-//         //     } else {
-//         //         if (spinner) spinner.classList.add('hidden');
-//         //         if (submitBtn) submitBtn.disabled = false;
-//         //         showToast(result?.message || "Impossible de mettre à jour le mot de passe.", "error");
-//         //     }
-//         // });
-
-//         // Écouteur sur la soumission du formulaire
-// document.getElementById('pwd-form').addEventListener('submit', async (e) => {
-//     e.preventDefault();
-
-//     const oldPassword = document.getElementById('old-password-input').value.trim();
-//     const newPassword = document.getElementById('new-password-input').value.trim();
-//     const confirmPassword = document.getElementById('confirm-password-input').value.trim();
-//     const spinner = document.getElementById('pwd-spinner');
-//     const submitBtn = document.getElementById('submit-new-pwd-btn');
-
-//     // 1. Validations de surface côté client
-//     if (!oldPassword || !newPassword || !confirmPassword) {
-//         showToast("Veuillez remplir tous les champs de sécurité.", "error");
-//         return;
-//     }
-
-//     if (newPassword.length < 6) {
-//         showToast("Le nouveau mot de passe doit contenir au moins 6 caractères.", "error");
-//         return;
-//     }
-
-//     if (newPassword !== confirmPassword) {
-//         showToast("La confirmation ne correspond pas au nouveau mot de passe.", "error");
-//         return;
-//     }
-
-//     if (oldPassword === newPassword) {
-//         showToast("Le nouveau mot de passe doit être différent de l'actuel.", "error");
-//         return;
-//     }
-
-//     // Activer l'état de chargement
-//     if (spinner) spinner.classList.remove('hidden');
-//     if (submitBtn) submitBtn.disabled = true;
-
-//     try {
-//         // Récupérer l'email stocké lors de la session
-//         const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-
-//         console.log("Email récupéré pour ré-authentification :", currentUser);
-        
-//         // STEP 1 : Vérifier l'ancien mot de passe via POST /auth/login
-//         console.log("[SECURITY CHECK] Vérification de l'ancien mot de passe...");
-//         const authCheck = await apiRequest("/auth/login", "POST", {
-//             email: currentUser.email,
-//             password: oldPassword
-//         });
-
-//         if (!authCheck || !authCheck.success) {
-//             showToast("L'ancien mot de passe est incorrect.", "error");
-//             if (spinner) spinner.classList.add('hidden');
-//             if (submitBtn) submitBtn.disabled = false;
-//             return;
-//         }
-
-//         // STEP 2 : Si l'ancien mot de passe est valide, on met à jour avec PATCH /users/me
-//         console.log("[ACTION] Mise à jour du nouveau mot de passe...");
-//         const updateResult = await apiRequest("/users/me", "PATCH", {
-//             password: newPassword
-//         });
-
-//         if (updateResult && updateResult.success) {
-//             showToast("Mot de passe mis à jour ! Redirection vers la connexion...", "success");
-
-//             setTimeout(() => {
-//                 localStorage.clear();
-//                 window.location.href = "/auth/signIn.html";
-//             }, 2000);
-//         } else {
-//             showToast(updateResult?.message || "Erreur lors de la mise à jour.", "error");
-//             if (spinner) spinner.classList.add('hidden');
-//             if (submitBtn) submitBtn.disabled = false;
-//         }
-
-//     } catch (err) {
-//         console.error(err);
-//         showToast("Une erreur est survenue lors de la vérification.", "error");
-//         if (spinner) spinner.classList.add('hidden');
-//         if (submitBtn) submitBtn.disabled = false;
-//     }
-// });
-//     }
-
-function togglePasswordForm() {
-    const container = document.getElementById('password-form-container');
-    if (!container) return;
-
-    // Si le formulaire est déjà visible, on le ferme au clic suivant
-    if (!container.classList.contains('hidden')) {
-        container.classList.add('hidden');
-        container.innerHTML = '';
-        return;
-    }
-
-    // On vérifie qu'on a bien l'utilisateur connecté en cache
-    if (!localConnectedUserCache || !localConnectedUserCache.email) {
-        showToast("Impossible de récupérer l'email de l'utilisateur connecté.", "error");
-        return;
-    }
-
-    // Injection du formulaire DaisyUI
-    container.innerHTML = `
-        <form id="pwd-form" class="p-4 border border-base-content/10 bg-base-200/30 rounded-2xl flex flex-col gap-3 mt-4">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/60">Sécuriser le compte</h4>
-            
-            <div class="form-control w-full">
-                <label class="label py-1"><span class="label-text text-xs">Mot de passe actuel</span></label>
-                <input type="password" id="old-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
-            </div>
-
-            <div class="form-control w-full">
-                <label class="label py-1"><span class="label-text text-xs">Nouveau mot de passe</span></label>
-                <input type="password" id="new-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
-            </div>
-
-            <div class="form-control w-full">
-                <label class="label py-1"><span class="label-text text-xs">Confirmer le nouveau mot de passe</span></label>
-                <input type="password" id="confirm-password-input" class="input input-bordered input-sm w-full" placeholder="••••••••" required>
-            </div>
-
-            <button type="submit" id="submit-new-pwd-btn" class="btn btn-primary btn-sm text-white mt-2 w-full">
-                <span id="pwd-spinner" class="loading loading-spinner loading-xs hidden"></span>
-                Confirmer le changement
-            </button>
-        </form>
-    `;
-    container.classList.remove('hidden');
-
-    // Écouteur sur la soumission
-    document.getElementById('pwd-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const oldPassword = document.getElementById('old-password-input').value.trim();
-        const newPassword = document.getElementById('new-password-input').value.trim();
-        const confirmPassword = document.getElementById('confirm-password-input').value.trim();
-        const spinner = document.getElementById('pwd-spinner');
-        const submitBtn = document.getElementById('submit-new-pwd-btn');
-
-        // 1. Validations côté client
-        if (!oldPassword || !newPassword || !confirmPassword) {
-            showToast("Veuillez remplir tous les champs.", "error");
-            return;
-        }
-
-        if (newPassword.length < 6) {
-            showToast("Le nouveau mot de passe doit contenir au moins 6 caractères.", "error");
-            return;
-        }
-
-        if (newPassword !== confirmPassword) {
-            showToast("La confirmation ne correspond pas au nouveau mot de passe.", "error");
-            return;
-        }
-
-        if (oldPassword === newPassword) {
-            showToast("Le nouveau mot de passe doit être différent de l'actuel.", "error");
-            return;
-        }
-
-        // Activation visuelle du loader
-        if (spinner) spinner.classList.remove('hidden');
-        if (submitBtn) submitBtn.disabled = true;
-
-        try {
-            // STEP 1 : On récupère l'email directement depuis localConnectedUserCache
-            const userEmail = localConnectedUserCache.email;
-            console.log("[SECURITY CHECK] Vérification du mot de passe pour :", userEmail);
-
-            // STEP 2 : Vérification de l'ancien mot de passe via POST /auth/login
-            const authCheck = await apiRequest("/auth/login", "POST", {
-                email: userEmail,
-                password: oldPassword
-            });
-
-            // Si la vérification échoue
-            if (!authCheck || authCheck.success === false || authCheck.status >= 400) {
-                showToast("L'ancien mot de passe est incorrect.", "error");
-                return;
-            }
-
-            // STEP 3 : Mise à jour avec le nouveau mot de passe via PATCH /users/me
-            console.log("[ACTION] Envoi du nouveau mot de passe...");
-            const updateResult = await apiRequest("/users/me", "PATCH", {
-                password: newPassword
-            });
-
-            if (updateResult && (updateResult.success || updateResult.id)) {
-                showToast("Mot de passe mis à jour ! Redirection vers la connexion...", "success");
-
-                setTimeout(() => {
-                    localStorage.clear();
-                    window.location.href = "auth/signIn.html";
-                }, 2000);
-            } else {
-                showToast(updateResult.message || "Erreur lors de la mise à jour.", "error");
-            }
-
-        } catch (err) {
-            console.error(err);
-            showToast("Une erreur est survenue lors du traitement.", "error");
-        } finally {
-            if (spinner) spinner.classList.add('hidden');
-            if (submitBtn) submitBtn.disabled = false;
-        }
-    });
-}
-
-    const changePasswordBtn = document.getElementById('change-password-btn');
     if (changePasswordBtn) {
         changePasswordBtn.addEventListener('click', togglePasswordForm);
     }
 
-    const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
+        logoutBtn.addEventListener('click', () => {
             localStorage.clear();
             window.location.href = "auth/signIn.html";
         });
     }
 }
 
-const logoutBtn = document.getElementById('logout-btn');
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-        localStorage.clear();
-        window.location.href = "auth/signIn.html";
-    });
-}
+// async function saveProfileData(fieldsToUpdate) {
+//     const btnText = document.getElementById('save-btn-text');
+//     const btnSpinner = document.getElementById('save-btn-spinner');
+
+//     if (btnText && btnSpinner) {
+//         btnText.classList.add('hidden');
+//         btnSpinner.classList.remove('hidden');
+//     }
+
+//     console.log("[PATCH /users/me] Payload envoyé :", fieldsToUpdate);
+//     const result = await apiRequest("/users/me", "PATCH", fieldsToUpdate);
+//     console.log("[PATCH /users/me] Réponse serveur :", result);
+
+//     if (btnText && btnSpinner) {
+//         btnText.classList.remove('hidden');
+//         btnSpinner.classList.add('hidden');
+//     }
+
+//     // Accepte success: true OU le retour direct de l'objet user
+//     if (result && (result.success || result.id || result._id || result.email)) {
+//         showToast("Profil mis à jour avec succès !");
+//         localConnectedUserCache = null;
+//         await fetchConnectedUser();
+//     } else {
+//         showToast(result?.message || "Erreur lors de la sauvegarde.", "error");
+//     }
+// }
 
 
-async function saveProfileData(fieldsToUpdate) {
-    const btnText = document.getElementById('save-btn-text');
-    const btnSpinner = document.getElementById('save-btn-spinner');
+// async function saveProfileData(fieldsToUpdate) {
+//     const btnText = document.getElementById('save-btn-text');
+//     const btnSpinner = document.getElementById('save-btn-spinner');
 
-    if (btnText && btnSpinner) {
-        btnText.classList.add('hidden');
-        btnSpinner.classList.remove('hidden');
-    }
+//     if (btnText && btnSpinner) {
+//         btnText.classList.add('hidden');
+//         btnSpinner.classList.remove('hidden');
+//     }
 
-    const result = await apiRequest("/users/me", "PATCH", fieldsToUpdate);
+//     const result = await apiRequest("/users/me", "PATCH", fieldsToUpdate);
 
-    if (btnText && btnSpinner) {
-        btnText.classList.remove('hidden');
-        btnSpinner.classList.add('hidden');
-    }
+//     if (btnText && btnSpinner) {
+//         btnText.classList.remove('hidden');
+//         btnSpinner.classList.add('hidden');
+//     }
 
-    if (result && result.success) {
-        showToast("Profil mis à jour avec succès !");
-        localConnectedUserCache = null;
-        await fetchConnectedUser();
-    } else {
-        showToast("Erreur lors de la sauvegarde.", "error");
-    }
-}
+//     if (result && result.success) {
+//         showToast("Profil mis à jour avec succès !");
+//         localConnectedUserCache = null;
+//         await fetchConnectedUser();
+//     } else {
+//         showToast("Erreur lors de la sauvegarde.", "error");
+//     }
+// }
 
 
 
 // ==================== INITIALISATION AUTOMATIQUE ====================
+
 
 document.addEventListener("DOMContentLoaded", async () => {
     setupUserFilter();
